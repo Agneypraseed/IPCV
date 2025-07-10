@@ -169,7 +169,7 @@ We assume that:
    E[η(x, y)] = 0
    ```
 
-**Averaging $ K $ noisy images:**
+**Averaging `K` noisy images:**
 
 $$ \frac{1}{K} \sum\_{i=1}^{K} g_i(x, y) \approx f(x, y) $$
 
@@ -192,8 +192,8 @@ This operation can give negative values.
 -   Negative values (which cannot be directly displayed)
 -   Visual indistinguishability unless processed.
 
-When the difference is small, $$ g(x, y) $$ is close to 0, which appears dark or black.  
-When the difference is large and positive, $$ g(x, y) $$ is a large value, appearing bright or white.
+When the difference is small, ` g(x, y) ` is close to 0, which appears dark or black.  
+When the difference is large and positive, ` g(x, y) ` is a large value, appearing bright or white.
 
 To handle negative results and see the magnitude of the difference, we take the absolute value:
 
