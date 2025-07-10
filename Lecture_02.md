@@ -224,3 +224,31 @@ $$
 **Visualization:**
 
 The resulting image $ \tilde{g} $ will appear white everywhere, with dark pixels exactly where the image was altered. This makes the change easily detectable by the human eye.
+
+<hr>
+
+**Image formation** involves capturing a scene via a camera, influenced by:
+
+- **Illumination:** The light source and its intensity.
+- **Scene:** The objects being photographed.
+- **Imaging system:** The optics (lens, sensor) that project the scene onto a 2D image plane.
+
+This projection results in a continuous image function `f(x, y)`, where `f` gives a grey value (or intensity) at each point.
+
+The grey value `f(x, y)` is thus a product of how much light there is and how reflective the object is at that point.
+
+A monochrome image is described by a function:
+
+```
+f(x, y) = i(x, y) · r(x, y)
+```
+
+where:
+
+- `i(x, y)`: Illumination function
+- `r(x, y)`: Reflectance function
+- `f(x, y)`: Resultant grey value
+
+Digital grey values are usually within the range `[0, 255]` or normalized to `[0, 1]`.
+
+
