@@ -566,9 +566,7 @@ With log transform: The intensely bright values are "toned down" significantly, 
 
 Power-law transformations are defined as:
 
-```
-T(r) = c · r^γ
-```
+$$ T(r) = c · r^γ $$
 
 Where:
 
@@ -591,9 +589,8 @@ Where:
   - Expands **bright tones**.
   - Useful for brightening already bright areas and suppressing dark ones.
 
+![alt text](/images/image6.png)
 ---
-
-### Notes on Usage
 
 - **Gamma Correction** is widely used in display systems (e.g., TVs, monitors, cameras).
   - Most displays apply a **γ > 1** transformation to match the nonlinear perception of brightness by the human eye.
