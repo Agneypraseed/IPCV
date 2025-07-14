@@ -684,6 +684,7 @@ $$
 This **brightens the image preemptively**, such that when the CRT applies its natural gamma response (darkening), the **final result appears visually accurate**.
 
 ---
+
 In addition to gamma correction, power-law transformations are useful for general-purpose contrast
 manipulation.
 Image enhancement is a balancing act. There is no single "magic" gamma value that works for every image.
@@ -711,33 +712,34 @@ In contrast to predefined, smooth transformation curves (such as logarithmic or 
 **Piecewise linear transformations** divide the input intensity range into multiple segments, within each of which a linear transformation is applied independently.
 
 This allows for:
-- Arbitrary manipulation of specific intensity ranges.
-- Local contrast enhancement or suppression.
-- Fine-grained control over tone curves for applications like **contrast enhancement**, **histogram modification**, or **tone mapping**.
+
+-   Arbitrary manipulation of specific intensity ranges.
+-   Local contrast enhancement or suppression.
+-   Fine-grained control over tone curves for applications like **contrast enhancement**, **histogram modification**, or **tone mapping**.
 
 ### Example Use Case
 
 Suppose the desired behavior is as follows:
 
-| Intensity Range | Desired Effect |
-|------------------|----------------|
-| 0 – 50           | **Brighten** the darkest grays significantly. |
-| 51 – 180         | **Leave unchanged** (linear mapping, identity). |
-| 181 – 255        | **Slightly darken** the brightest values. |
+| Intensity Range | Desired Effect                                  |
+| --------------- | ----------------------------------------------- |
+| 0 – 50          | **Brighten** the darkest grays significantly.   |
+| 51 – 180        | **Leave unchanged** (linear mapping, identity). |
+| 181 – 255       | **Slightly darken** the brightest values.       |
 
 A **single log or gamma curve cannot achieve this**, as they apply a smooth and continuous global transformation. However, a **piecewise linear function** allows precise control by defining separate linear segments for each region.
 
 To construct such a piecewise function, one needs to define **control points** \( (r_k, s_k) \), where:
 
-- \( r_k \): input intensity values (independent variable),
-- \( s_k \): corresponding output intensity values (dependent variable),
-- The full transformation is a set of linear equations connecting these points.
+-   \( r_k \): input intensity values (independent variable),
+-   \( s_k \): corresponding output intensity values (dependent variable),
+-   The full transformation is a set of linear equations connecting these points.
 
 #### For example:
 
-- Segment 1: \( r = 0 \) to \( r = 50 \) → map to a steeper increase, e.g., \( s = 2r \),
-- Segment 2: \( r = 51 \) to \( r = 180 \) → identity mapping: \( s = r \),
-- Segment 3: \( r = 181 \) to \( r = 255 \) → gentle compression: \( s = 0.8r + b \), where \( b \) adjusts for continuity.
+-   Segment 1: \( r = 0 \) to \( r = 50 \) → map to a steeper increase, e.g., \( s = 2r \),
+-   Segment 2: \( r = 51 \) to \( r = 180 \) → identity mapping: \( s = r \),
+-   Segment 3: \( r = 181 \) to \( r = 255 \) → gentle compression: \( s = 0.8r + b \), where \( b \) adjusts for continuity.
 
 This method provides **complete control** over the transformation curve, making it suitable for highly specific adjustments.
 
@@ -745,10 +747,10 @@ This method provides **complete control** over the transformation curve, making 
 
 ### Main Disadvantage: User-Defined Complexity
 
-| Transformation Type         | User Effort |
-|-----------------------------|-------------|
-| **Power-law transformation** | Minimal: Only requires gamma and a scaling constant \( c \). |
-| **Piecewise linear**         | High: Requires explicit definition of control points  (r_1, s_1), (r_2, s_2) |
+| Transformation Type          | User Effort                                                                 |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| **Power-law transformation** | Minimal: Only requires gamma and a scaling constant \( c \).                |
+| **Piecewise linear**         | High: Requires explicit definition of control points (r_1, s_1), (r_2, s_2) |
 
 ---
 
@@ -756,9 +758,9 @@ This method provides **complete control** over the transformation curve, making 
 
 Low-contrast images are often the result of:
 
-- Poor illumination conditions,
-- Limited dynamic range in sensors,
-- Incorrect acquisition settings (e.g., lens aperture).
+-   Poor illumination conditions,
+-   Limited dynamic range in sensors,
+-   Incorrect acquisition settings (e.g., lens aperture).
 
 #### Purpose
 
@@ -770,40 +772,79 @@ Low-contrast images are often the result of:
 
 Let:
 
-- \( (r_1, s_1) \) and \( (r_2, s_2) \) be user-defined control points,
-- The transformation function is linear between those points,
-- Beyond these points, output values may be clipped or scaled accordingly.
+-   \( (r_1, s_1) \) and \( (r_2, s_2) \) be user-defined control points,
+-   The transformation function is linear between those points,
+-   Beyond these points, output values may be clipped or scaled accordingly.
 
 **Cases:**
 
-- If \( r_1 = s_1 \) and \( r_2 = s_2 \), the transformation is **identity**: no change.
-- If \( r_1 = r_2 \), \( s_1 = 0 \), and \( s_2 = L - 1 \), the function becomes a **binary threshold**, producing a two-level (black/white) image.
-- For intermediate values, contrast is **enhanced** in the selected regions.
-
-**Monotonicity Constraint:**
+-   If \( r_1 = s_1 \) and \( r_2 = s_2 \), the transformation is **identity**: no change.
+-   If \( r_1 = r_2 \), \( s_1 = 0 \), and \( s_2 = L - 1 \), the function becomes a **binary threshold**, producing a two-level (black/white) image.
+-   For intermediate values, contrast is **enhanced** in the selected regions.
 
 ### Monotonicity and Artifacts
 
+Artifacts are any unwanted or unnatural visual elements created by a processing step, what happens when you break the monotonicity rule.
+
 To avoid creating artifacts or reordering pixel intensities, the transformation should be:
 
-- **Single-valued**, and  
-- **Monotonically increasing**, i.e., `r₁ ≤ r₂` and `s₁ ≤ s₂`
+-   **Single-valued**, and
+-   **Monotonically increasing**, i.e., `r₁ ≤ r₂` and `s₁ ≤ s₂`
 
+![alt text](/images/image9.png)
 ---
 
 ### Practical Application
 
 **Given an 8-bit image**:
 
-- Let `r_min` and `r_max` be the **minimum** and **maximum** intensity values in the input image.
+-   Let `r_min` and `r_max` be the **minimum** and **maximum** intensity values in the input image.
 
 To stretch the entire intensity range:
 
-- Define:  
-  `(r₁, s₁) = (r_min, 0)`  
-  `(r₂, s₂) = (r_max, L − 1)`
+-   Define:  
+    `(r₁, s₁) = (r_min, 0)`  
+    `(r₂, s₂) = (r_max, L − 1)`
 
 This linearly maps the input intensities to span the full range `[0, L − 1]`, improving visual contrast.
+
+## The Transformation Function
+
+We define:
+
+- \( r_1 = f_{\text{min}} \)  
+- \( r_2 = f_{\text{max}} \)  
+- \( s_1 = 0 \)  
+- \( s_2 = L - 1 \)
+
+Then the affine (linear) transformation function is:
+
+```math
+T_{\text{affine}}(r) = \frac{(r - f_{\text{min}})(L - 1)}{f_{\text{max}} - f_{\text{min}}}
+```
+
+This maps the original range \( [f_{\text{min}}, f_{\text{max}}] \) linearly to \( [0, L - 1] \).
+
+---
+
+### Why This Works (Verification)
+
+To verify the correctness of the formula, check its behavior at the boundary values:
+
+- When \( r = f_{\text{min}} \):
+
+```math
+T_{\text{affine}}(f_{\text{min}}) = \frac{(f_{\text{min}} - f_{\text{min}})(L - 1)}{f_{\text{max}} - f_{\text{min}}} = 0 = s_1
+```
+
+- When \( r = f_{\text{max}} \):
+
+```math
+T_{\text{affine}}(f_{\text{max}}) = \frac{(f_{\text{max}} - f_{\text{min}})(L - 1)}{f_{\text{max}} - f_{\text{min}}} = L - 1 = s_2
+```
+
+Hence, the transformation maps the input range \( [f_{\text{min}}, f_{\text{max}}] \) onto the full display range \( [0, L - 1] \).
+
 
 ---
 
@@ -811,23 +852,15 @@ This linearly maps the input intensities to span the full range `[0, L − 1]`, 
 
 To convert a grayscale image to binary using **mean intensity** `m` as a threshold:
 
-- Define:  
-  `(r₁, s₁) = (m, 0)`  
-  `(r₂, s₂) = (m, L − 1)`
+-   Define:  
+    `(r₁, s₁) = (m, 0)`  
+    `(r₂, s₂) = (m, L − 1)`
 
 This produces a binary image where:
 
-- Intensities `< m` are mapped to **black**  
-- Intensities `≥ m` are mapped to **white**
+-   Intensities `< m` are mapped to **black**
+-   Intensities `≥ m` are mapped to **white**
 
 ---
 
-### Summary
 
-| Transformation Type       | Key Benefit                          | Primary Drawback                              |
-|---------------------------|------------------------------------|----------------------------------------------|
-| Piecewise Linear Function | Precise, region-specific control   | Requires manual definition of segments       |
-| Contrast Stretching       | Expands low-contrast images linearly| May not preserve fine details in shadows/highlights |
-| Thresholding              | Converts image to binary            | Loses all grayscale information              |
-
----
