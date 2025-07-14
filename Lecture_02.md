@@ -1,9 +1,8 @@
-
 **Image formation** involves capturing a scene via a camera, influenced by:
 
-- **Illumination:** The light source and its intensity.
-- **Scene:** The objects being photographed.
-- **Imaging system:** The optics (lens, sensor) that project the scene onto a 2D image plane.
+-   **Illumination:** The light source and its intensity.
+-   **Scene:** The objects being photographed.
+-   **Imaging system:** The optics (lens, sensor) that project the scene onto a 2D image plane.
 
 This projection results in a continuous image function `f(x, y)`, where `f` gives a grey value (or intensity) at each point.
 
@@ -17,16 +16,16 @@ f(x, y) = i(x, y) · r(x, y)
 
 where:
 
-- `i(x, y)`: Illumination function
-- `r(x, y)`: Reflectance function
-- `f(x, y)`: Resultant grey value
+-   `i(x, y)`: Illumination function
+-   `r(x, y)`: Reflectance function
+-   `f(x, y)`: Resultant grey value
 
 Digital grey values are usually within the range `[0, 255]` or normalized to `[0, 1]`.
 
 **Sampling and Quantization**
 
-- **Sampling:** Converts continuous spatial domain into a discrete grid.
-- **Quantization:** Converts continuous intensity values into discrete levels.
+-   **Sampling:** Converts continuous spatial domain into a discrete grid.
+-   **Quantization:** Converts continuous intensity values into discrete levels.
 
 ---
 
@@ -36,8 +35,8 @@ Each element `f(i, j)` is a pixel at position `(i, j)`.
 
 **Coordinate system:**
 
-- Origin at the top-left: `(0, 0)`
-- Image center: `(x_c, y_c) = (⌊M / 2⌋, ⌊N / 2⌋)`
+-   Origin at the top-left: `(0, 0)`
+-   Image center: `(x_c, y_c) = (⌊M / 2⌋, ⌊N / 2⌋)`
 
 ![alt text](/images/image.png)
 
@@ -64,9 +63,9 @@ To convert a 2D coordinate `(x, y)` to a 1D index `α`, use the following formul
 
 Where:
 
-- `M` is the number of columns in the image (or matrix).
-- `x` is the horizontal coordinate (column index).
-- `y` is the vertical coordinate (row index).
+-   `M` is the number of columns in the image (or matrix).
+-   `x` is the horizontal coordinate (column index).
+-   `y` is the vertical coordinate (row index).
 
 **Recovery** (From 1D index back to 2D coordinates):
 
@@ -86,9 +85,9 @@ This is the order used by Fortran, MATLAB, and OpenCV in some contexts:
 
 Where:
 
-- `M` is the number of rows in the matrix.
-- `x` is the horizontal coordinate (column index).
-- `y` is the vertical coordinate (row index).
+-   `M` is the number of rows in the matrix.
+-   `x` is the horizontal coordinate (column index).
+-   `y` is the vertical coordinate (row index).
 
 →
 
@@ -101,9 +100,9 @@ This is used in C, C++, Python (NumPy):
 
 Where:
 
-- `N` is the number of columns in the matrix.
-- `x` is the horizontal coordinate (column index).
-- `y` is the vertical coordinate (row index).
+-   `N` is the number of columns in the matrix.
+-   `x` is the horizontal coordinate (column index).
+-   `y` is the vertical coordinate (row index).
 
 ---
 
@@ -114,7 +113,7 @@ Bit depth defines the number of bits used to represent the intensity value of ea
 
 A `b`-bit image has `2^b` grey levels.
 
-- **8-bit** → 256 levels (0–255)
+-   **8-bit** → 256 levels (0–255)
 
 When too few intensity levels are used for an image that contains smooth gradients (such as a clear sky or a curved surface), an artifact known as **posterization** or **false contouring** can appear.
 
@@ -125,7 +124,6 @@ Low resolution (2–16 levels) often reveals unintended contours and artifacts.
 ![alt text](/images/image2.png)
 
 ---
-
 
 **Arithmetic Operations Between Images**  
 Applicable only if the images are of the same size:
@@ -165,17 +163,15 @@ We assume that:
 2. **The noise has zero mean value**  
    For any given pixel, the random noise `η` is equally likely to be positive (making the pixel brighter) as it is to be negative (making it darker). Over many images, the average of all the random noise values at that one pixel location will be zero:
 
-   ```
-   E[η(x, y)] = 0
-   ```
+    ```
+    E[η(x, y)] = 0
+    ```
 
 **Averaging `K` noisy images:**
 
 $$ \frac{1}{K} \sum\_{i=1}^{K} g_i(x, y) \approx f(x, y) $$
 
-
 ---
-
 
 ### Caution with Differences
 
@@ -192,8 +188,8 @@ This operation can give negative values.
 -   Negative values (which cannot be directly displayed)
 -   Visual indistinguishability unless processed.
 
-When the difference is small, ` g(x, y) ` is close to 0, which appears dark or black.  
-When the difference is large and positive, ` g(x, y) ` is a large value, appearing bright or white.
+When the difference is small, `g(x, y)` is close to 0, which appears dark or black.  
+When the difference is large and positive, `g(x, y)` is a large value, appearing bright or white.
 
 To handle negative results and see the magnitude of the difference, we take the absolute value:
 
@@ -207,18 +203,18 @@ $$ \tilde{g}(x, y) = L - 1 - |g(x, y)| $$
 
 Where:
 
-- `L` is the intensity resolution, typically 256, so `L - 1 = 255`.
+-   `L` is the intensity resolution, typically 256, so `L - 1 = 255`.
 
 **The effect:**
 
-- Smaller differences (i.e., areas where the two images are similar) appear brighter (closer to 255).
-- Larger differences appear darker.
+-   Smaller differences (i.e., areas where the two images are similar) appear brighter (closer to 255).
+-   Larger differences appear darker.
 
 **Example**  
 Let us assume:
 
-- `f(x, y)`: original image.  
-- `h(x, y)`: same image but with a small object removed (e.g., a person erased).
+-   `f(x, y)`: original image.
+-   `h(x, y)`: same image but with a small object removed (e.g., a person erased).
 
 **Compute:**
 
@@ -234,8 +230,8 @@ g̃(x, y) = 255 - |g(x, y)|
 
 **Results:**
 
-- All unchanged areas → `g̃ = 255` (white).
-- Changed area (object removed) → darker pixels (as intensity difference is non-zero).
+-   All unchanged areas → `g̃ = 255` (white).
+-   Changed area (object removed) → darker pixels (as intensity difference is non-zero).
 
 **Visualization:**
 
@@ -570,62 +566,141 @@ $$ T(r) = c · r^γ $$
 
 Where:
 
-- `r`: Input pixel intensity (normalized between 0 and 1).
-- `T(r)`: Output pixel intensity.
-- `c`: A positive constant for scaling (commonly set to 1).
-- `γ (gamma)`: The exponent that controls the transformation behavior.
+-   `r`: Input pixel intensity (normalized between 0 and 1).
+-   `T(r)`: Output pixel intensity.
+-   `c`: A positive constant for scaling (commonly set to 1).
+-   `γ (gamma)`: The exponent that controls the transformation behavior.
 
 ---
 
 ### Behavior Based on Gamma (γ)
 
-- **γ < 1**:  
-  - Expands **dark tones**.
-  - Compresses **bright tones**.
-  - Useful for enhancing details in dark regions.
+-   **γ < 1**:
 
-- **γ > 1**:  
-  - Compresses **dark tones**.
-  - Expands **bright tones**.
-  - Useful for brightening already bright areas and suppressing dark ones.
+    -   Expands **dark tones**.
+    -   Compresses **bright tones**.
+    -   Useful for enhancing details in dark regions.
 
-![alt text](/images/image6.png)
----
+-   **γ > 1**:
+    -   Compresses **dark tones**.
+    -   Expands **bright tones**.
+    -   Useful for brightening already bright areas and suppressing dark ones.
 
-- **Gamma Correction** is widely used in display systems (e.g., TVs, monitors, cameras).
-  - Most displays apply a **γ > 1** transformation to match the nonlinear perception of brightness by the human eye.
-  - Cameras often apply an **inverse gamma** to linearize recorded images.
+## ![alt text](/images/image6.png)
 
-- An extended version of the transformation may include an offset:
-  
-  ```
+-   **Gamma Correction** is widely used in display systems (e.g., TVs, monitors, cameras).
+
+    -   Most displays apply a **γ > 1** transformation to match the nonlinear perception of brightness by the human eye.
+    -   Cameras often apply an **inverse gamma** to linearize recorded images.
+
+-   An extended version of the transformation may include an offset:
+
+$$
   s = c · (r + ε)^γ
-  ```
-  - This accounts for non-zero output even when the input is zero.
-  - However, such offsets are typically considered calibration artifacts and are usually ignored in standard formulations.
+$$
+
+-   This accounts for non-zero output even when the input is zero ( r = 0).
+-   However, such offsets are typically considered calibration artifacts and are usually ignored in standard formulations.
+
+-   Both **log** and **power-law** transformations serve to **compress or expand** intensity ranges.
+-   **γ < 1** (fractional exponents) have a similar effect to log functions:
+
+    -   They map **dark input values** to a wider **output range**.
+    -   They compress the **bright input values**.
+
+-   Conversely, **γ > 1** performs the **opposite**:
+    -   Maps **bright input values** to a wider range.
+    -   Compresses **dark regions**.
 
 ---
 
-### Comparison with Log Transformations
+### Gamma Correction and Power-Law Response in Imaging Devices
 
-- Both **log** and **power-law** transformations serve to **compress or expand** intensity ranges.
-- **γ < 1** (fractional exponents) have a similar effect to log functions:
-  - They map **dark input values** to a wider **output range**.
-  - They compress the **bright input values**.
-
-- Conversely, **γ > 1** performs the **opposite**:
-  - Maps **bright input values** to a wider range.
-  - Compresses **dark regions**.
+Many electronic imaging devices—such as older **CRT monitors**, **scanners**, and certain **printers**—do **not** reproduce brightness in a linear manner. Instead, their input-output intensity relationships follow a **power-law** behavior.
 
 ---
 
-### Summary
+### Device Response: Power-Law Nonlinearity
 
-Power-law (gamma) transformations provide a flexible tool for intensity adjustment:
+Most display and capture systems obey a response curve of the form:
 
-- They are foundational in **gamma correction**.
-- They allow fine control over tonal adjustments.
-- Their behavior is determined by the value of `γ`.
+$$
+\text{Output} = \text{Input}^{\gamma}
+$$
 
-These transformations are essential for both image enhancement and proper display of visual data.
+Where:
+
+-   `Input` is the normalized signal intensity (0 to 1),
+-   `γ (gamma)` is the device's nonlinear response exponent,
+-   `Output` is the actual intensity produced by the device.
+
+---
+
+### Examples of Gamma Behavior
+
+-   **CRT Monitors** typically have a gamma between **1.8 and 2.5**.
+-   If an image is not pre-corrected, it appears darker than intended because all dark values are suppressed.
+-   This means:
+    -   If you send a 50% gray signal (`Input = 0.5`),
+    -   The displayed brightness may only be approximately **0.5²⋅⁵ ≈ 0.18**, or 18% of the maximum intensity.
+-   Thus, **mid-tones appear darker** than intended.
+
+---
+
+### Problem: Visual Distortion
+
+This nonlinear behavior introduces visible distortions, particularly in **mid-tone** regions:
+
+-   The image appears **too dark** on devices with γ > 1.
+-   Linear content (e.g., raw sensor data or computed image outputs) does not render accurately without correction.
+
+---
+
+### Solution: Gamma Correction
+
+To compensate for the device’s distortion, we apply a **pre-correction** using the inverse gamma function:
+
+#### Gamma Correction Formula
+
+$$
+\text{Corrected Input} = \text{Original Input}^{1/\gamma}
+$$
+
+Where:
+
+-   `Original Input`: Linear intensity value from the source image,
+-   `γ`: Gamma of the target display device (e.g., 2.5),
+-   `1/γ`: Inverse gamma exponent used for pre-correction.
+
+**Example:**
+
+-   Suppose a CRT display has a gamma of **2.5**.
+-   To correct for this, the image data must be transformed using:
+
+$$
+\text{Corrected Input} = (\text{Original Input})^{1/2.5} \approx (\text{Original Input})^{0.4}
+$$
+
+This **brightens the image preemptively**, such that when the CRT applies its natural gamma response (darkening), the **final result appears visually accurate**.
+
+---
+In addition to gamma correction, power-law transformations are useful for general-purpose contrast
+manipulation.
+Image enhancement is a balancing act. There is no single "magic" gamma value that works for every image.
+
+#### γ < 1 brightens an image by mapping dark input values to a wider range of output values
+
+![alt text](/images/image7.png)
+
+![alt text](/images/image8.png)
+
+---
+
+#### γ > 1 darkens an image by mapping bright input values to a wider range.
+
+![alt text](/images/image-11.png)
+
+![alt text](/images/image-22.png)
+
+---
 
