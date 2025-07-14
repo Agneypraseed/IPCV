@@ -860,3 +860,37 @@ This produces a binary image where:
 -   Intensities `≥ m` are mapped to **white**
 
 ---
+
+## Intensity-Level Slicing
+
+Intensity-level slicing is used to highlight specific ranges of intensity values in an image, often for feature enhancement. This technique is especially useful in applications like:
+
+-   Enhancing masses of water in satellite imagery
+-   Highlighting flaws or abnormalities in X-ray images
+
+There are two primary approaches:
+
+---
+
+### 1. **Binary Slicing**
+
+-   **Definition**: Map the intensities within a specified range to one fixed value (e.g., white), and all other intensities to another value (e.g., black).
+-   **Effect**: Produces a **binary image**.
+-   **Use Case**: When only the presence or absence of a particular intensity range is important.
+
+**Example**:
+
+If the range of interest is from `A` to `B`, then:
+
+-   For all `r` such that `A ≤ r ≤ B`, map to `255` (white)
+-   Otherwise, map to `0` (black)
+
+---
+
+### 2. **Slicing with Background Retained**
+
+-   **Definition**: Brighten or darken the intensity values within a specified range, but **leave all other intensities unchanged**.
+-   **Effect**: Preserves the original image, while emphasizing a particular range.
+-   **Use Case**: Useful when it is important to both highlight certain regions and maintain the context provided by the rest of the image.
+
+## ![alt text](/images/image10.png)
