@@ -791,8 +791,7 @@ To avoid creating artifacts or reordering pixel intensities, the transformation 
 -   **Single-valued**, and
 -   **Monotonically increasing**, i.e., `r₁ ≤ r₂` and `s₁ ≤ s₂`
 
-![alt text](/images/image9.png)
----
+## ![alt text](/images/image9.png)
 
 ### Practical Application
 
@@ -812,10 +811,10 @@ This linearly maps the input intensities to span the full range `[0, L − 1]`, 
 
 We define:
 
-- \( r_1 = f_{\text{min}} \)  
-- \( r_2 = f_{\text{max}} \)  
-- \( s_1 = 0 \)  
-- \( s_2 = L - 1 \)
+-   `r1 = f_min`
+-   `r2 = f_max`
+-   `s1 = 0`
+-   `s2 = L - 1`
 
 Then the affine (linear) transformation function is:
 
@@ -823,7 +822,7 @@ Then the affine (linear) transformation function is:
 T_{\text{affine}}(r) = \frac{(r - f_{\text{min}})(L - 1)}{f_{\text{max}} - f_{\text{min}}}
 ```
 
-This maps the original range \( [f_{\text{min}}, f_{\text{max}}] \) linearly to \( [0, L - 1] \).
+This maps the original range `[f_min, f_max]` linearly to `[0, L - 1]`.
 
 ---
 
@@ -831,20 +830,19 @@ This maps the original range \( [f_{\text{min}}, f_{\text{max}}] \) linearly to 
 
 To verify the correctness of the formula, check its behavior at the boundary values:
 
-- When \( r = f_{\text{min}} \):
+-   **Case 1: When `r = f_min`**
 
 ```math
 T_{\text{affine}}(f_{\text{min}}) = \frac{(f_{\text{min}} - f_{\text{min}})(L - 1)}{f_{\text{max}} - f_{\text{min}}} = 0 = s_1
 ```
 
-- When \( r = f_{\text{max}} \):
+**Case 2: When `r = f_max`**
 
 ```math
 T_{\text{affine}}(f_{\text{max}}) = \frac{(f_{\text{max}} - f_{\text{min}})(L - 1)}{f_{\text{max}} - f_{\text{min}}} = L - 1 = s_2
 ```
 
-Hence, the transformation maps the input range \( [f_{\text{min}}, f_{\text{max}}] \) onto the full display range \( [0, L - 1] \).
-
+Hence, the transformation maps the range `[f_min, f_max]` to `[0, L - 1]`.
 
 ---
 
@@ -862,5 +860,3 @@ This produces a binary image where:
 -   Intensities `≥ m` are mapped to **white**
 
 ---
-
-
