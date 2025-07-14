@@ -704,3 +704,130 @@ Image enhancement is a balancing act. There is no single "magic" gamma value tha
 
 ---
 
+### Piecewise Linear Transformation Functions
+
+In contrast to predefined, smooth transformation curves (such as logarithmic or power-law functions), **piecewise linear transformation functions** offer highly customizable control over the intensity mapping process.
+
+**Piecewise linear transformations** divide the input intensity range into multiple segments, within each of which a linear transformation is applied independently.
+
+This allows for:
+- Arbitrary manipulation of specific intensity ranges.
+- Local contrast enhancement or suppression.
+- Fine-grained control over tone curves for applications like **contrast enhancement**, **histogram modification**, or **tone mapping**.
+
+### Example Use Case
+
+Suppose the desired behavior is as follows:
+
+| Intensity Range | Desired Effect |
+|------------------|----------------|
+| 0 – 50           | **Brighten** the darkest grays significantly. |
+| 51 – 180         | **Leave unchanged** (linear mapping, identity). |
+| 181 – 255        | **Slightly darken** the brightest values. |
+
+A **single log or gamma curve cannot achieve this**, as they apply a smooth and continuous global transformation. However, a **piecewise linear function** allows precise control by defining separate linear segments for each region.
+
+To construct such a piecewise function, one needs to define **control points** \( (r_k, s_k) \), where:
+
+- \( r_k \): input intensity values (independent variable),
+- \( s_k \): corresponding output intensity values (dependent variable),
+- The full transformation is a set of linear equations connecting these points.
+
+#### For example:
+
+- Segment 1: \( r = 0 \) to \( r = 50 \) → map to a steeper increase, e.g., \( s = 2r \),
+- Segment 2: \( r = 51 \) to \( r = 180 \) → identity mapping: \( s = r \),
+- Segment 3: \( r = 181 \) to \( r = 255 \) → gentle compression: \( s = 0.8r + b \), where \( b \) adjusts for continuity.
+
+This method provides **complete control** over the transformation curve, making it suitable for highly specific adjustments.
+
+---
+
+### Main Disadvantage: User-Defined Complexity
+
+| Transformation Type         | User Effort |
+|-----------------------------|-------------|
+| **Power-law transformation** | Minimal: Only requires gamma and a scaling constant \( c \). |
+| **Piecewise linear**         | High: Requires explicit definition of control points  (r_1, s_1), (r_2, s_2) |
+
+---
+
+### Contrast Stretching
+
+Low-contrast images are often the result of:
+
+- Poor illumination conditions,
+- Limited dynamic range in sensors,
+- Incorrect acquisition settings (e.g., lens aperture).
+
+#### Purpose
+
+**Contrast stretching** aims to **expand the range of pixel intensities** in an image so that it spans the full available dynamic range of the output device (e.g., [0, 255] for 8-bit images).
+
+---
+
+#### Transformation Function
+
+Let:
+
+- \( (r_1, s_1) \) and \( (r_2, s_2) \) be user-defined control points,
+- The transformation function is linear between those points,
+- Beyond these points, output values may be clipped or scaled accordingly.
+
+**Cases:**
+
+- If \( r_1 = s_1 \) and \( r_2 = s_2 \), the transformation is **identity**: no change.
+- If \( r_1 = r_2 \), \( s_1 = 0 \), and \( s_2 = L - 1 \), the function becomes a **binary threshold**, producing a two-level (black/white) image.
+- For intermediate values, contrast is **enhanced** in the selected regions.
+
+**Monotonicity Constraint:**
+
+### Monotonicity and Artifacts
+
+To avoid creating artifacts or reordering pixel intensities, the transformation should be:
+
+- **Single-valued**, and  
+- **Monotonically increasing**, i.e., `r₁ ≤ r₂` and `s₁ ≤ s₂`
+
+---
+
+### Practical Application
+
+**Given an 8-bit image**:
+
+- Let `r_min` and `r_max` be the **minimum** and **maximum** intensity values in the input image.
+
+To stretch the entire intensity range:
+
+- Define:  
+  `(r₁, s₁) = (r_min, 0)`  
+  `(r₂, s₂) = (r_max, L − 1)`
+
+This linearly maps the input intensities to span the full range `[0, L − 1]`, improving visual contrast.
+
+---
+
+### Thresholding Example (Binary Output)
+
+To convert a grayscale image to binary using **mean intensity** `m` as a threshold:
+
+- Define:  
+  `(r₁, s₁) = (m, 0)`  
+  `(r₂, s₂) = (m, L − 1)`
+
+This produces a binary image where:
+
+- Intensities `< m` are mapped to **black**  
+- Intensities `≥ m` are mapped to **white**
+
+---
+
+### Summary
+
+| Transformation Type       | Key Benefit                          | Primary Drawback                              |
+|---------------------------|------------------------------------|----------------------------------------------|
+| Piecewise Linear Function | Precise, region-specific control   | Requires manual definition of segments       |
+| Contrast Stretching       | Expands low-contrast images linearly| May not preserve fine details in shadows/highlights |
+| Thresholding              | Converts image to binary            | Loses all grayscale information              |
+
+---
