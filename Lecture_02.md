@@ -764,7 +764,8 @@ Low-contrast images are often the result of:
 
 #### Purpose
 
-**Contrast stretching** aims to **expand the range of pixel intensities** in an image so that it spans the full available dynamic range of the output device (e.g., [0, 255] for 8-bit images).
+Linear contrast stretching (also called normalization) is a point-wise intensity transformation used to improve the contrast of a grayscale image by expanding the range of intensity values (gray levels) to span the full available range
+[0,L−1], where 𝐿 is typically 256 for 8-bit images.
 
 ---
 
@@ -843,6 +844,12 @@ T_{\text{affine}}(f_{\text{max}}) = \frac{(f_{\text{max}} - f_{\text{min}})(L - 
 ```
 
 Hence, the transformation maps the range `[f_min, f_max]` to `[0, L - 1]`.
+
+Linear contrast stretching is a pointwise operation that linearly maps the smallest and largest intensity values of the original image to the full display range.
+
+It is particularly effective for enhancing low-contrast images.
+
+![alt text](/images/image14.png)
 
 ---
 
@@ -989,3 +996,11 @@ Low-Order Bit Planes (e.g., Planes 1 and 2): These planes look almost like rando
 -   Using the four highest-order bit planes can reconstruct the image with acceptable detail, while reducing storage by approximately 50%.
 
 ## ![alt text](/images/image12.png)
+
+---
+
+### Common Point Operations
+
+![alt text](/images/image13.png)
+
+---
