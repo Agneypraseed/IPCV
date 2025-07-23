@@ -211,3 +211,68 @@ p_s(s) = p_r(r) * (dr/ds)
 ![alt text](/images/image16.png)
 
 ---
+
+![alt text](/images/image17.png)
+
+---
+
+## Spatial Filtering
+
+Spatial filtering involves modifying an image by applying a function to the neighborhood of each pixel. The process replaces each pixel’s value with a new value computed from its surroundings.
+
+The term _filter_ originates from frequency domain processing, where filtering refers to the process of **passing, modifying, or suppressing** specific frequency components within an image. For instance:
+
+-   A **lowpass filter** allows low-frequency components to pass while attenuating high frequencies.
+-   The visual result of applying a lowpass filter is image **smoothing**, commonly perceived as **blurring**.
+
+Although frequency domain techniques are a powerful tool for image processing, similar effects—such as smoothing—can also be achieved directly in the **spatial domain** using spatial filters.
+
+The key idea is to apply a kernel (or mask) over the image, processing each pixel in context with its neighborhood to achieve the desired transformation—such as enhancement, noise reduction, or edge detection.
+
+---
+
+## Linear Spatial Filtering
+
+A **linear spatial filter** operates by performing a **sum-of-products** between an image `f(x, y)` and a **filter kernel** `w(s, t)`. The kernel—also referred to as a _mask_, _template_, or _window_—is a small matrix that defines both:
+
+-   The **neighborhood** over which the filtering is applied, and
+-   The **coefficients** that determine the nature of the filtering operation (e.g., smoothing, sharpening).
+
+---
+
+### Basic Operation
+
+The mechanics of linear spatial filtering are illustrated using a `3 × 3` kernel. For any pixel at location `(x, y)` in the input image, the filtered response `g(x, y)` is given by the **sum of products** between the kernel coefficients and the corresponding pixels in the neighborhood:
+
+```
+g(x, y) =
+    w(-1, -1)·f(x-1, y-1) + w(-1, 0)·f(x-1, y) + w(-1, 1)·f(x-1, y+1) +
+    w( 0, -1)·f(x,   y-1) + w( 0, 0)·f(x,   y) + w( 0, 1)·f(x,   y+1) +
+    w( 1, -1)·f(x+1, y-1) + w( 1, 0)·f(x+1, y) + w( 1, 1)·f(x+1, y+1)
+```
+
+This represents a typical convolution-like filtering operation.
+
+---
+
+### General Form
+
+To generalize for a kernel of size `m × n`, where `m = 2a + 1` and `n = 2b + 1` (ensuring odd dimensions), the linear filtering operation is expressed as:
+
+$$
+g(x, y) = Σ_{s=-a}^{a} Σ_{t=-b}^{b} w(s, t) · f(x + s, y + t)
+$$
+
+This defines the **linear filtering** process over the entire image.
+
+-   `f(x + s, y + t)` are the neighboring pixels of the input image,
+-   `w(s, t)` are the kernel weights, and
+-   `g(x, y)` is the corresponding output pixel in the filtered image.
+
+As the coordinates `(x, y)` are varied across the image, the kernel slides across each pixel location, computing a new filtered value at every position.
+
+The use of **odd-sized kernels** ensures a well-defined center.
+
+---
+
+
