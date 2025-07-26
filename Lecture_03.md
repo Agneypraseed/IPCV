@@ -603,29 +603,16 @@ w = [1 1 1
 
 This kernel is separable because it can be expressed as:
 
-- Column vector `c`:
-  \[
-  c = \begin{bmatrix}
-  1 \\
-  1
-  \end{bmatrix}
-  \]
+$c = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$
+ and 
+$r = \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$
 
-- Row vector `rᵀ`:
-  \[
-  r^T = \begin{bmatrix}
-  1 & 1 & 1
-  \end{bmatrix}
-  \]
 
 Then:
 
 $$
 w = c · r^T = 
-    [1
-     1] × [1 1 1] =
-    [1 1 1
-     1 1 1]
+     \begin{bmatrix} 1 \\ 1 \end{bmatrix} \begin{bmatrix} 1 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix} = w
 $$
 
 Thus, `w` is the outer product `c · rᵀ`.
@@ -637,7 +624,7 @@ Thus, `w` is the outer product `c · rᵀ`.
 For a separable kernel `w` of size `m × n`, it can be written as:
 
 ```text
-w = v · wᵀ                    (Eq. 3-41)
+w = v · wᵀ                    
 ```
 
 Where:
@@ -648,12 +635,8 @@ Where:
 In the special case where the kernel is **square**, i.e., of size `m × m`, we can simplify the notation:
 
 ```text
-w = v · vᵀ                    (Eq. 3-42)
+w = v · vᵀ                    
 ```
-
----
-
-### Practical Insight
 
 The product of a column vector and a row vector yields a matrix. This operation is equivalent to the **2D convolution** of the vectors:
 
@@ -663,4 +646,3 @@ w = v * wᵀ
 
 Hence, separable kernels enable **more efficient filtering** by decomposing a 2D convolution into **two 1D convolutions**, one along rows and one along columns, significantly reducing computational complexity.
 
----
