@@ -582,3 +582,85 @@ These assume that **each value of the kernel** fully visits the result of the pr
 ![alt text](/images/image25.png)
 
 ---
+## Separable Spatial Filters
+
+A 2D function `G(x, y)` is said to be **separable** if it can be written as the product of two 1D functions:
+
+```text
+G(x, y) = G₁(x) · G₂(y)
+```
+
+In image processing, a **spatial filter kernel** is represented as a matrix. A kernel is said to be **separable** if it can be expressed as the **outer product** of two vectors.
+
+### Example: Separable Kernel
+
+Consider the following `2 × 3` kernel:
+
+```text
+w = [1 1 1
+     1 1 1]
+```
+
+This kernel is separable because it can be expressed as:
+
+- Column vector `c`:
+  \[
+  c = \begin{bmatrix}
+  1 \\
+  1
+  \end{bmatrix}
+  \]
+
+- Row vector `rᵀ`:
+  \[
+  r^T = \begin{bmatrix}
+  1 & 1 & 1
+  \end{bmatrix}
+  \]
+
+Then:
+
+$$
+w = c · r^T = 
+    [1
+     1] × [1 1 1] =
+    [1 1 1
+     1 1 1]
+$$
+
+Thus, `w` is the outer product `c · rᵀ`.
+
+---
+
+### General Form
+
+For a separable kernel `w` of size `m × n`, it can be written as:
+
+```text
+w = v · wᵀ                    (Eq. 3-41)
+```
+
+Where:
+
+- `v` is a column vector of size `m × 1`
+- `w` is a column vector of size `n × 1` (so `wᵀ` is a `1 × n` row vector)
+
+In the special case where the kernel is **square**, i.e., of size `m × m`, we can simplify the notation:
+
+```text
+w = v · vᵀ                    (Eq. 3-42)
+```
+
+---
+
+### Practical Insight
+
+The product of a column vector and a row vector yields a matrix. This operation is equivalent to the **2D convolution** of the vectors:
+
+```text
+w = v * wᵀ
+```
+
+Hence, separable kernels enable **more efficient filtering** by decomposing a 2D convolution into **two 1D convolutions**, one along rows and one along columns, significantly reducing computational complexity.
+
+---
