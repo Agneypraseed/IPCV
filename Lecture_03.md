@@ -420,6 +420,21 @@ Where:
 -   `δ(x − i, y − j)`: The **2D discrete unit impulse** centered at `(i, j)`
 -   The summation runs over all valid pixel coordinates `(i, j)` in the image domain
 
+Convolving any image f with an impulse δ gives you the original image f back, unchanged. The impulse is to convolution what the number 1 is to multiplication.
+
+    f * δ = f
+
+A 5x5 impulse at position (2, 2) would look like this:
+
+```
+[ 0, 0, 0, 0, 0 ]
+[ 0, 0, 0, 0, 0 ]
+[ 0, 0, 1, 0, 0 ]  <-- The single '1' at (2,2)
+[ 0, 0, 0, 0, 0 ]
+[ 0, 0, 0, 0, 0 ]
+```
+
+
 ---
 
 ### Spatial Correlation
