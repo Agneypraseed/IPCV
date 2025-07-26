@@ -603,16 +603,11 @@ w = [1 1 1
 
 This kernel is separable because it can be expressed as:
 
-$c = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$
- and 
-$r = \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$
-
+$c = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$ and $r = \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$
 
 Then:
-
 $$
-w = c · r^T = 
-     \begin{bmatrix} 1 \\ 1 \end{bmatrix} \begin{bmatrix} 1 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix} = w
+w = c \cdot r^T = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \begin{bmatrix} 1 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix}
 $$
 
 Thus, `w` is the outer product `c · rᵀ`.
