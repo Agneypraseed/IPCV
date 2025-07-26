@@ -603,12 +603,7 @@ w = [1 1 1
 
 This kernel is separable because it can be expressed as:
 
-$c = \begin{bmatrix} 1 \\ 1 \end{bmatrix}$ and $r = \begin{bmatrix} 1 \\ 1 \\ 1 \end{bmatrix}$
-
-Then:
-$$
-w = c \cdot r^T = \begin{bmatrix} 1 \\ 1 \end{bmatrix} \begin{bmatrix} 1 & 1 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 1 & 1 \\ 1 & 1 & 1 \end{bmatrix}
-$$
+![alt text](/images/image26.png)
 
 Thus, `w` is the outer product `c · rᵀ`.
 
@@ -641,3 +636,132 @@ w = v * wᵀ
 
 Hence, separable kernels enable **more efficient filtering** by decomposing a 2D convolution into **two 1D convolutions**, one along rows and one along columns, significantly reducing computational complexity.
 
+## Computational Advantages of Separable Kernels
+
+The primary benefit of using **separable kernels** lies in the computational efficiency gained through the **associative property** of convolution.
+
+Suppose we have a kernel `w` that can be decomposed into two simpler kernels, `w₁` and `w₂`, such that:
+
+```text
+w = w₁ * w₂
+```
+
+Then, due to the **commutative** and **associative** properties of convolution (see Table 3.5), it follows that:
+
+```text
+w * f = (w₁ * w₂) * f = w₁ * (w₂ * f) = w₂ * (w₁ * f)
+```
+
+This result (Equation 3-43) states that convolving a separable kernel `w` with an image `f` is equivalent to first convolving `f` with `w₁`, followed by convolving the result with `w₂`.
+
+---
+
+### Computational Complexity Comparison
+
+Let:
+
+- `f` be an image of size `M × N`
+- `w` be a filter kernel of size `m × n`
+
+#### Non-Separable Case
+
+Using Equation (3-35), convolving `w` with `f` requires approximately:
+
+```text
+O(M · N · m · n)
+```
+
+multiplication and addition operations. This is because every output pixel is influenced by all coefficients in the kernel.
+
+#### Separable Case
+
+If `w` is separable into `w₁` (`m × 1`) and `w₂` (`1 × n`), then:
+
+1. The first convolution, `w₁ * f`, requires `O(M · N · m)` operations.
+2. The second convolution, `w₂ * (w₁ * f)`, also produces an image of size `M × N` and requires `O(M · N · n)` operations.
+
+Thus, the **total operations** become:
+
+```text
+O(M · N · (m + n))
+```
+
+#### Computational Gain
+
+The **computational advantage** of using a separable kernel versus a non-separable kernel is given by:
+
+```text
+C = (M · N · m · n) / (M · N · (m + n)) = (m · n) / (m + n)      (Eq. 3-44)
+```
+
+For example, a kernel of size `11 × 11` yields:
+
+```text
+C = (11 × 11) / (11 + 11) = 121 / 22 ≈ 5.5
+```
+
+This means filtering can be over five times faster. For large kernels (hundreds of elements), speedups can reach a factor of **100 or more**, significantly improving execution time.
+
+---
+
+## Determining Kernel Separability
+
+From **matrix theory**, any matrix formed by the outer product of a **column vector** and a **row vector** has **rank 1**. Since separable kernels are defined in this way, we can determine separability by checking if the kernel matrix has rank 1.
+
+In practice, most programming environments provide built-in functions to compute matrix rank. For instance, in MATLAB:
+
+```matlab
+rank(w)
+```
+
+If `rank(w) == 1`, then `w` is separable.
+
+---
+
+### Extracting 1D Kernels from a Separable Kernel
+
+To decompose a rank-1 kernel `w` into its constituent 1D vectors `v` and `wᵀ`, follow these steps:
+
+1. **Identify a non-zero element** in the kernel and denote it as `E`.
+2. Extract the **column** and **row** that contain this element. Denote them:
+   - `c` = column vector
+   - `r` = row vector
+3. Use the following relationships (from Equation 3-41):
+
+```text
+v = c
+wᵀ = r / E
+```
+
+Thus:
+
+```text
+w = v · wᵀ
+```
+
+This decomposition works because all rows and columns in a rank-1 matrix are **linearly dependent**—they differ only by scalar multiples.
+
+---
+
+### Special Case: Circularly Symmetric Kernels
+
+For **circularly symmetric** kernels (e.g., Gaussian), the kernel can be described completely by the **central column vector**. In such cases:
+
+```text
+w = v · vᵀ · c
+```
+
+Where:
+- `v` is the central column vector,
+- `c` is the value at the center of the kernel.
+
+Then the 1D components used for convolution become:
+
+```text
+w₁ = v
+w₂ = vᵀ · c
+```
+
+This allows implementation of the 2D filter using two 1D convolutions, one horizontal and one vertical, maintaining both efficiency and accuracy.
+
+---
