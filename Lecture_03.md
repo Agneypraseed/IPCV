@@ -609,8 +609,6 @@ Thus, `w` is the outer product `c · rᵀ`.
 
 ---
 
-### General Form
-
 For a separable kernel `w` of size `m × n`, it can be written as:
 
 ```text
@@ -652,20 +650,13 @@ Then, due to the **commutative** and **associative** properties of convolution (
 w * f = (w₁ * w₂) * f = w₁ * (w₂ * f) = w₂ * (w₁ * f)
 ```
 
-This result (Equation 3-43) states that convolving a separable kernel `w` with an image `f` is equivalent to first convolving `f` with `w₁`, followed by convolving the result with `w₂`.
-
----
-
-### Computational Complexity Comparison
-
 Let:
 
 - `f` be an image of size `M × N`
 - `w` be a filter kernel of size `m × n`
 
-#### Non-Separable Case
-
-Using Equation (3-35), convolving `w` with `f` requires approximately:
+ 
+`For Non-Separable Case` convolving `w` with `f` requires approximately:
 
 ```text
 O(M · N · m · n)
@@ -673,7 +664,7 @@ O(M · N · m · n)
 
 multiplication and addition operations. This is because every output pixel is influenced by all coefficients in the kernel.
 
-#### Separable Case
+`For Separable Case` 
 
 If `w` is separable into `w₁` (`m × 1`) and `w₂` (`1 × n`), then:
 
@@ -686,12 +677,10 @@ Thus, the **total operations** become:
 O(M · N · (m + n))
 ```
 
-#### Computational Gain
-
 The **computational advantage** of using a separable kernel versus a non-separable kernel is given by:
 
 ```text
-C = (M · N · m · n) / (M · N · (m + n)) = (m · n) / (m + n)      (Eq. 3-44)
+C = (M · N · m · n) / (M · N · (m + n)) = (m · n) / (m + n)      
 ```
 
 For example, a kernel of size `11 × 11` yields:
@@ -708,11 +697,7 @@ This means filtering can be over five times faster. For large kernels (hundreds 
 
 From **matrix theory**, any matrix formed by the outer product of a **column vector** and a **row vector** has **rank 1**. Since separable kernels are defined in this way, we can determine separability by checking if the kernel matrix has rank 1.
 
-In practice, most programming environments provide built-in functions to compute matrix rank. For instance, in MATLAB:
-
-```matlab
-rank(w)
-```
+>The rank of a matrix is the maximum number of linearly independent rows or columns in the matrix
 
 If `rank(w) == 1`, then `w` is separable.
 
@@ -726,7 +711,7 @@ To decompose a rank-1 kernel `w` into its constituent 1D vectors `v` and `wᵀ`,
 2. Extract the **column** and **row** that contain this element. Denote them:
    - `c` = column vector
    - `r` = row vector
-3. Use the following relationships (from Equation 3-41):
+3. Use the following relationships:
 
 ```text
 v = c
@@ -748,7 +733,7 @@ This decomposition works because all rows and columns in a rank-1 matrix are **l
 For **circularly symmetric** kernels (e.g., Gaussian), the kernel can be described completely by the **central column vector**. In such cases:
 
 ```text
-w = v · vᵀ · c
+w = v · vᵀ / c
 ```
 
 Where:
@@ -759,9 +744,151 @@ Then the 1D components used for convolution become:
 
 ```text
 w₁ = v
-w₂ = vᵀ · c
+w₂ = vᵀ / c
 ```
 
 This allows implementation of the 2D filter using two 1D convolutions, one horizontal and one vertical, maintaining both efficiency and accuracy.
 
 ---
+
+### Example: Decomposing a Rank-1 Kernel into the Outer Product of Two Vectors
+
+### 🔷 Given 2D Kernel `w`
+
+Suppose we are given the following `3 × 3` kernel:
+
+```
+w =
+[  2   4   6
+   4   8  12
+   6  12  18 ]
+```
+
+### 🔷 Step 1: Pick a Non-Zero Entry
+
+Let’s choose the element at position `(0, 0)`:
+
+```
+E = w[0][0] = 2
+```
+
+---
+
+### 🔷 Step 2: Extract the Column and Row
+
+**Column vector** `c` (first column):
+
+```
+v = [ 2
+      4
+      6 ]
+```
+
+**Row vector** `r` (first row):
+
+```
+r = [ 2  4  6 ]
+```
+
+---
+
+### 🔷 Step 3: Normalize the Row Vector
+
+To construct the outer product:
+
+```
+v = c
+wᵀ = r / E = [ 2/2  4/2  6/2 ] = [ 1  2  3 ]
+```
+
+---
+
+### 🔷 Final Result
+
+We now have:
+
+```
+v   = [ 2
+         4
+         6 ]
+
+wᵀ = [ 1  2  3 ]
+```
+
+Taking the outer product:
+
+```
+w = v · wᵀ =
+    [ 2×1  2×2  2×3 ]   → [  2   4   6
+      4×1  4×2  4×3 ]      4   8  12
+      6×1  6×2  6×3 ]      6  12  18 ]
+```
+
+`w` is separable and equal to the outer product of `v` and `wᵀ`.
+
+### Example: Decomposition of a Circularly Symmetric Kernel into Separable 1D Components
+
+```
+w = (v · vᵀ) / c
+```
+
+---
+
+### 🔷 Step 1: Define a Circularly Symmetric Kernel
+
+Consider the following 3×3 Gaussian-like kernel:
+
+```
+w =
+[ 1  2  1
+  2  4  2
+  1  2  1 ]
+```
+
+This kernel is **circularly symmetric**, as its values are symmetric about the center and decrease radially.
+
+- Center value: `c = 4`
+- Central column vector `v` (middle column):
+
+```
+v = [ 2
+      4
+      2 ]
+```
+
+---
+
+### 🔷 Step 2: Outer Product of `v` with Itself
+
+Compute the outer product:
+
+```
+v · vᵀ =
+[ 2     ]   ·   [ 2  4  2 ] =
+[ 4     ]
+[ 2     ]
+
+Result:
+[  4   8   4
+   8  16   8
+   4   8   4 ]
+```
+
+---
+
+### 🔷 Step 3: Normalize by `c = 4`
+
+Divide the entire matrix by `4`:
+
+```
+w = (v · vᵀ) / 4 =
+[ 1  2  1
+  2  4  2
+  1  2  1 ]
+```
+This matches the original kernel.
+
+---
+
+
+
