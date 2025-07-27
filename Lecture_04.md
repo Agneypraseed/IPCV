@@ -311,6 +311,18 @@ are uniquely notable because they are the **only circularly symmetric kernels th
 
 Because Gaussian kernels are separable, they share the **computational efficiency advantages** of box filters, yet exhibit many additional properties that make them especially well-suited for image processing tasks. These properties will be detailed in the following sections.
 
+The 2D Gaussian kernel $G(x, y)$ can be **decomposed into the outer product of two 1D kernels**:
+
+$$
+G(x, y) = G_1(x) \cdot G_2(y)
+$$
+
+And because the Gaussian function is **circularly symmetric**, it follows that:
+
+$$
+G_1 = G_2
+$$
+
 ### Radial Form of the Gaussian Kernel
 
 By defining the radial distance from the center as
@@ -325,8 +337,9 @@ $$
 G(r) = K e^{-\frac{r^2}{2\sigma^2}}
 $$
 
-
 This form emphasizes the **circular symmetry** of the Gaussian function: its value depends solely on the distance \( r \) from the kernel center, regardless of direction.
+
+![alt text](/images/image35.png)
 
 ---
 
@@ -346,6 +359,8 @@ This relation helps in defining the extent of the kernel and in normalizing the 
 
 ### Kernel Construction by Sampling
 
+![alt text](/images/image34.png)
+
 The Gaussian kernel shown above was obtained by **sampling** with parameters $K = 1$ and $\sigma = 1$. The process involves:
 
 1. Specifying discrete values of $s$ and $t$ corresponding to kernel coordinates.
@@ -358,8 +373,8 @@ The Gaussian kernel shown above was obtained by **sampling** with parameters $K 
 
 Because Gaussian kernels are separable, the 2-D kernel can be constructed efficiently by:
 
-- Taking samples along a 1-D cross-section through the kernel center to form a vector $\mathbf{v}$.
-- Using this vector to generate the 2-D kernel via:
+-   Taking samples along a 1-D cross-section through the kernel center to form a vector $\mathbf{v}$.
+-   Using this vector to generate the 2-D kernel via:
 
 $$
 \mathbf{K} = \mathbf{v} \mathbf{v}^T
@@ -367,3 +382,80 @@ $$
 
 This separability significantly reduces computational complexity, making Gaussian filtering practical for many real-time and high-resolution image processing tasks.
 
+**Separability** is one of the many fundamental properties of **circularly symmetric Gaussian kernels**.
+
+The Gaussian function falls off exponentially.
+
+For example, we know that the values of a Gaussian function at a distance greater than $3\sigma$ from the mean are **sufficiently small to be ignored**.
+
+$$
+G(x) = e^{- \frac{x^2}{2\sigma^2}}
+$$
+
+When $$( x = 3\sigma )$$, we substitute into the equation:
+
+$$
+G(3\sigma) = e^{- \frac{(3\sigma)^2}{2\sigma^2}} = e^{- \frac{9\sigma^2}{2\sigma^2}} = e^{- \frac{9}{2}} \approx 0.011
+$$
+
+Thus, at a distance of $( 3\sigma )$ from the center, the Gaussian function has a value of approximately **0.011**.
+
+
+![alt text](/images/image36.png)
+
+To ensure the kernel includes all significant Gaussian weights,  
+set the kernel size to cover the range $[-3\sigma,\ 3\sigma]$.
+
+Hence, the required minimum size is:
+
+$\text{Size} = 2 \cdot \lceil 3\sigma \rceil + 1$
+
+
+This implies that if we select the size of a Gaussian kernel to be $L_M \times L_M$, where:
+
+```math
+L_M = \lceil 6\sigma \rceil
+```
+
+(the notation $\lceil c \rceil$ denotes the **ceiling** of $c$, i.e., the smallest integer not less than $c$), then we are assured of obtaining **essentially the same result** as if we had used an arbitrarily large Gaussian kernel.
+
+Viewed differently, this tells us that there is **no practical benefit** to using a Gaussian kernel larger than $L_M \times L_M$ for image processing purposes.
+
+Since we typically use kernels with **odd dimensions**, we would choose the **smallest odd integer** that satisfies this condition. For example, if $\sigma = 7$, then:
+
+```math
+L_M = \lceil 6 \cdot 7 \rceil = \lceil 42 \rceil = 43
+```
+
+So, we would use a $43 \times 43$ kernel.
+
+---
+
+Gaussian Convolution: Mean and Standard Deviation
+
+Let $g(x)$ and $h(x)$ be two 1D Gaussian functions with respective means $\mu_g$, $\mu_h$ and standard deviations $\sigma_g$, $\sigma_h$. When convolved, the resulting Gaussian $f(x) = g(x) * h(x)$ has the following properties:
+
+- **Mean of the result**:
+
+```math
+\mu_{g * h} = \mu_g + \mu_h
+```
+
+- **Standard deviation of the result**:
+
+```math
+\sigma_{g * h} = \sqrt{\sigma_g^2 + \sigma_h^2}
+```
+
+This behavior is fundamental in signal and image processing:
+
+- Convolution of two Gaussians yields **another Gaussian**, centered at the sum of the means and with **widened spread** due to the combined variances.
+- The variances (i.e., $\sigma^2$) **add** under convolution.
+
+This property also underpins the **multi-scale nature** of Gaussian filtering: repeated applications of Gaussian filters of standard deviations $\sigma_1, \sigma_2, \dots$ can be **combined into a single Gaussian** of standard deviation:
+
+```math
+\sigma_{\text{total}} = \sqrt{\sigma_1^2 + \sigma_2^2 + \dots}
+```
+
+---
