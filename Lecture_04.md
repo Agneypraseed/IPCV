@@ -246,4 +246,124 @@ Alternative padding strategies can help eliminate such border artifacts.
 
 ---
 
+## Limitations of Box Filters
+
+Due to their computational simplicity, **box filters** are well-suited for rapid prototyping and **quick experimentation**. In many cases, they produce **visually acceptable smoothing** results, particularly when minimal processing time is desired. They are also beneficial when the goal is to **reduce the impact of smoothing on image edges**.
+
+However, box filters exhibit several important limitations that make them **unsuitable for precision or perceptually accurate applications**.
+
+---
+
+### 🔹 Limitation 1: Poor Approximation of Lens Blur
+
+In imaging systems, a **defocused lens** behaves as a **lowpass filter**. However, box filters fail to replicate the **blurring characteristics** observed in such optical scenarios.
+
+> **Problem 3.33:**  
+> A single point of light can be modeled by a digital image consisting of all `0`s, with a single `1` located at the position of the light point.  
+> When viewed through a **defocused lens**, this point appears as a **fuzzy blob**, the size of which increases with the degree of defocus.
+>
+> Although it might seem intuitive to model this blur using a **box kernel**, such a filter performs poorly in replicating the smooth, radial falloff of light characteristic of real optical blur.
+>
+> A **Gaussian kernel** is a better approximation because its structure mimics the **circular symmetry and smooth decay** of a defocused point source.
+>
+> Thus:
+>
+> -   Box filters: Provide uniform weighting and sharp edges → **unnatural, blocky blur**
+> -   Gaussian filters: Provide smooth, radially symmetric weighting → **natural, lens-like blur**
+
+---
+
+### 🔹 Limitation 2: Directional Bias
+
+Box filters inherently favor **blurring along perpendicular directions**—horizontal and vertical—due to their **rectangular, separable structure**.
+
+This directional preference can lead to **anisotropic blurring**, which is problematic in applications involving:
+
+-   High-detail imagery
+-   Strong geometric features (e.g., architectural images, technical drawings)
+
+In such cases, the filter may:
+
+-   Produce **unnatural smoothing patterns**
+-   **Degrade key visual elements** (e.g., lines, edges, and corners)
+
+The **axis-aligned nature of the box kernel** produces **non-uniform smoothing artifacts**.
+
+---
+
+## Circularly Symmetric (Isotropic) Kernels: Gaussian Filters
+
+In many image processing applications where isotropy (orientation independence) is desired, the preferred kernels are **circularly symmetric** (also called isotropic). This means that the filter response depends only on the distance from the kernel center, not on direction.
+
+### Gaussian Kernels
+
+Gaussian kernels of the form
+
+$$
+w(s,t) = G(s,t) = K e^{-\frac{s^2 + t^2}{2\sigma^2}}
+$$
+
+are uniquely notable because they are the **only circularly symmetric kernels that are also separable**
+
+-   Here, \( s \) and \( t \) represent spatial coordinates (typically discrete integers for digital images).
+-   \( K \) is a normalizing constant.
+-   \{sigma} controls the spread (standard deviation) of the Gaussian.
+
+Because Gaussian kernels are separable, they share the **computational efficiency advantages** of box filters, yet exhibit many additional properties that make them especially well-suited for image processing tasks. These properties will be detailed in the following sections.
+
+### Radial Form of the Gaussian Kernel
+
+By defining the radial distance from the center as
+
+$$
+r = \sqrt{s^2 + t^2}
+$$
+
+we can rewrite the Gaussian function as a function of \( r \) alone:
+
+$$
+G(r) = K e^{-\frac{r^2}{2\sigma^2}}
+$$
+
+
+This form emphasizes the **circular symmetry** of the Gaussian function: its value depends solely on the distance \( r \) from the kernel center, regardless of direction.
+
+---
+
+### Kernel Size and Distance Calculation
+
+For typical odd-sized kernels (e.g., $m \times m$), the kernel center lies at an integer coordinate, and the squared distance values $r^2$ at each kernel position are also integers.
+
+Specifically, the squared distance to a corner point of the kernel is given by:
+
+$$
+r_{\text{max}}^2 = \left(\frac{m - 1}{2}\right)^2 + \left(\frac{m - 1}{2}\right)^2 = 2 \left(\frac{m - 1}{2}\right)^2
+$$
+
+This relation helps in defining the extent of the kernel and in normalizing the Gaussian weights.
+
+---
+
+### Kernel Construction by Sampling
+
+The Gaussian kernel shown above was obtained by **sampling** with parameters $K = 1$ and $\sigma = 1$. The process involves:
+
+1. Specifying discrete values of $s$ and $t$ corresponding to kernel coordinates.
+2. Evaluating the Gaussian function at each coordinate to obtain kernel coefficients.
+3. Normalizing the kernel by dividing each coefficient by the sum of all coefficients, ensuring that the filter preserves the average intensity of uniform regions (similar to box kernel normalization).
+
+---
+
+### Separable Implementation
+
+Because Gaussian kernels are separable, the 2-D kernel can be constructed efficiently by:
+
+- Taking samples along a 1-D cross-section through the kernel center to form a vector $\mathbf{v}$.
+- Using this vector to generate the 2-D kernel via:
+
+$$
+\mathbf{K} = \mathbf{v} \mathbf{v}^T
+$$
+
+This separability significantly reduces computational complexity, making Gaussian filtering practical for many real-time and high-resolution image processing tasks.
 
