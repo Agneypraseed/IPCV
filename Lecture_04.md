@@ -690,3 +690,44 @@ The **median filter** is by far the most useful order-statistic filter in image 
 
 ---
 
+## Highpass filtering | Image Sharpening
+
+Image blurring could be accomplished in the spatial domain by pixel averaging (smoothing) within a neighborhood. Because averaging is analogous to integration, it is logical to conclude that sharpening can be accomplished by **spatial differentiation**.
+
+The strength of the response of a derivative operator is proportional to the magnitude of the intensity discontinuity at the point where the operator is applied. Thus, image differentiation enhances **edges and other discontinuities** (such as noise) and de-emphasizes areas with slowly varying intensities.
+
+Smoothing is often referred to as **lowpass filtering**, a term borrowed from frequency domain processing. Similarly, sharpening is often referred to as **highpass filtering**, where high frequencies responsible for fine details are passed, while low frequencies are attenuated or rejected.
+
+---
+
+We analyze sharpening filters based on **first-order** and **second-order derivatives**. 
+
+Digital derivatives are defined using **differences** between pixel values. Definitions must satisfy certain fundamental conditions:
+
+#### For a First-Order Derivative:
+1. Must be zero in areas of constant intensity.
+2. Must be nonzero at the onset of a step or ramp.
+3. Must be nonzero along intensity ramps.
+
+#### For a Second-Order Derivative:
+1. Must be zero in areas of constant intensity.
+2. Must be nonzero at the onset and end of a step or ramp.
+3. Must be zero along intensity ramps.
+
+Because pixel values and positions are discrete and finite, the **maximum intensity change** occurs between **adjacent pixels**.
+
+A basic definition of the **first-order derivative** of a one-dimensional function `f(x)` is the difference:
+
+$\frac{\partial f}{\partial x} = f(x+1) - f(x)$ &nbsp;&nbsp;&nbsp;&nbsp;
+
+We use a **partial derivative** here to maintain consistent notation when extending to image functions of two variables, `f(x, y)`, where we deal with partial derivatives along the two spatial axes.
+
+The **second-order derivative** of `f(x)` is defined as:
+
+$\frac{\partial^2 f}{\partial x^2} = f(x+1) + f(x-1) - 2f(x)$ &nbsp;&nbsp;&nbsp;&nbsp;
+
+These definitions satisfy the conditions necessary for discrete differentiation.
+
+
+In digital images, edges often appear as ramp-like transitions in intensity. In such cases, the first derivative produces thick edges because it remains nonzero along the ramp. Conversely, the second derivative produces a double edge that is one pixel thick, separated by zeros. From this observation, we conclude that the second derivative enhances fine detail more effectively than the first derivative, making it especially suitable for image sharpening. Additionally, second derivatives require fewer operations to implement than first derivatives, hence the initial focus on the former.
+
