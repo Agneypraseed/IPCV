@@ -170,7 +170,7 @@ Other applications include:
 -   **Smoothing false contours** caused by insufficient intensity levels,
 -   **Enhancing images** when used with techniques like histogram equalization and unsharp masking.
 
->Lowpass filtering refers to applying a filter that removes high-frequency content such as edges, textures, and fine details, while preserving low-frequency variations like gradual illumination changes or shading.
+> Lowpass filtering refers to applying a filter that removes high-frequency content such as edges, textures, and fine details, while preserving low-frequency variations like gradual illumination changes or shading.
 
 ---
 
@@ -402,7 +402,6 @@ $$
 
 Thus, at a distance of $( 3\sigma )$ from the center, the Gaussian function has a value of approximately **0.011**.
 
-
 ![alt text](/images/image36.png)
 
 To ensure the kernel includes all significant Gaussian weights,  
@@ -411,7 +410,6 @@ set the kernel size to cover the range $[-3\sigma,\ 3\sigma]$.
 Hence, the required minimum size is:
 
 $\text{Size} = 2 \cdot \lceil 3\sigma \rceil + 1$
-
 
 This implies that if we select the size of a Gaussian kernel to be $L_M \times L_M$, where:
 
@@ -437,13 +435,13 @@ Gaussian Convolution: Mean and Standard Deviation
 
 Let $g(x)$ and $h(x)$ be two 1D Gaussian functions with respective means $\mu_g$, $\mu_h$ and standard deviations $\sigma_g$, $\sigma_h$. When convolved, the resulting Gaussian $f(x) = g(x) * h(x)$ has the following properties:
 
-- **Mean of the result**:
+-   **Mean of the result**:
 
 ```math
 \mu_{g * h} = \mu_g + \mu_h
 ```
 
-- **Standard deviation of the result**:
+-   **Standard deviation of the result**:
 
 ```math
 \sigma_{g * h} = \sqrt{\sigma_g^2 + \sigma_h^2}
@@ -451,8 +449,8 @@ Let $g(x)$ and $h(x)$ be two 1D Gaussian functions with respective means $\mu_g$
 
 This behavior is fundamental in signal and image processing:
 
-- Convolution of two Gaussians yields **another Gaussian**, centered at the sum of the means and with **widened spread** due to the combined variances.
-- The variances (i.e., $\sigma^2$) **add** under convolution.
+-   Convolution of two Gaussians yields **another Gaussian**, centered at the sum of the means and with **widened spread** due to the combined variances.
+-   The variances (i.e., $\sigma^2$) **add** under convolution.
 
 This property also underpins the **multi-scale nature** of Gaussian filtering: repeated applications of Gaussian filters of standard deviations $\sigma_1, \sigma_2, \dots$ can be **combined into a single Gaussian** of standard deviation:
 
@@ -460,7 +458,7 @@ This property also underpins the **multi-scale nature** of Gaussian filtering: r
 \sigma_{\text{total}} = \sqrt{\sigma_1^2 + \sigma_2^2 + \dots}
 ```
 
-So, you can use a single Gaussian filter with 
+So, you can use a single Gaussian filter with
 $\sigma_{\text{total}}$ for the same result.
 
 ---
@@ -471,25 +469,24 @@ $\sigma_{\text{total}}$ for the same result.
 
 Gaussian kernels generally need to be **larger than box filters** to achieve **the same degree of blurring**. This is due to a key structural difference:
 
-- A **box filter** assigns **equal weight** to all pixels within the kernel.
-- A **Gaussian filter** assigns **weights that decay with distance** from the kernel center, giving less importance to peripheral pixels.
+-   A **box filter** assigns **equal weight** to all pixels within the kernel.
+-   A **Gaussian filter** assigns **weights that decay with distance** from the kernel center, giving less importance to peripheral pixels.
 
 ---
 
 ### 🔹 Kernel Size Selection
 
-- There is **no significant advantage** to using Gaussian kernels **larger than $\lceil 6\sigma \rceil \times \lceil 6\sigma \rceil$**.
+-   There is **no significant advantage** to using Gaussian kernels **larger than $\lceil 6\sigma \rceil \times \lceil 6\sigma \rceil$**.
 
 Since kernel sizes must typically be **odd integers** (for symmetry about the center), we choose the **nearest odd integer** to $6\sigma$.
 
 For example:
 
-- A **$21 \times 21$ Gaussian kernel** requires approximately $\sigma = 3.5$.
-- Applying this kernel to the test pattern yields **less blurring** than a $21 \times 21$ box filter 
-To achieve a **comparable blurring effect**, we need a **larger $\sigma$**, specifically:
+-   A **$21 \times 21$ Gaussian kernel** requires approximately $\sigma = 3.5$.
+-   Applying this kernel to the test pattern yields **less blurring** than a $21 \times 21$ box filter
+    To achieve a **comparable blurring effect**, we need a **larger $\sigma$**, specifically:
 
-- $\sigma = 7$ ⇒ Gaussian kernel size = $43 \times 43$
-
+-   $\sigma = 7$ ⇒ Gaussian kernel size = $43 \times 43$
 
 ---
 
@@ -497,14 +494,14 @@ To achieve a **comparable blurring effect**, we need a **larger $\sigma$**, spec
 
 A **larger-than-necessary Gaussian kernels** do not provide meaningful improvements in smoothing.
 
-- A **$43 \times 43$ kernel** (minimum size satisfying $6\sigma$, with $\sigma = 7$)
-- A **$85 \times 85$ kernel**, which is **double the size**, using the same $\sigma = 7$
+-   A **$43 \times 43$ kernel** (minimum size satisfying $6\sigma$, with $\sigma = 7$)
+-   A **$85 \times 85$ kernel**, which is **double the size**, using the same $\sigma = 7$
 
 **Observations**:
 
-- The result from the $85 \times 85$ kernel is **visually indistinguishable** from that of the $43 \times 43$ kernel 
-- The **difference image** confirms that the two filtered images differ **only slightly**, with a **maximum pixel difference of 0.75**.
-- This value is **less than one intensity level** out of 256 in an 8-bit image, hence **negligible** in practice.
+-   The result from the $85 \times 85$ kernel is **visually indistinguishable** from that of the $43 \times 43$ kernel
+-   The **difference image** confirms that the two filtered images differ **only slightly**, with a **maximum pixel difference of 0.75**.
+-   This value is **less than one intensity level** out of 256 in an 8-bit image, hence **negligible** in practice.
 
 ![alt text](/images/image38.png)
 
@@ -514,24 +511,23 @@ A **larger-than-necessary Gaussian kernels** do not provide meaningful improveme
 
 ![alt text](/images/image37.png)
 
-- The **box filter** produces **linear smoothing**, characterized by a transition from black to white at the edge that forms a **ramp-shaped profile**.
-  
-  - Key features of the box filter’s edge transition include **sharp changes** at the beginning and end of the ramp.
-  
-  - Such behavior is desirable when **preserving sharper edges** with less smoothing is important.
+-   The **box filter** produces **linear smoothing**, characterized by a transition from black to white at the edge that forms a **ramp-shaped profile**.
 
-- The **Gaussian filter**, on the other hand, produces **significantly smoother edge transitions**.
-  
-  - The intensity profile transitions more gradually and smoothly around edges.
-  
-  - This type of filter is preferable when a **generally uniform smoothing effect** across the image is required.
+    -   Key features of the box filter’s edge transition include **sharp changes** at the beginning and end of the ramp.
 
-- The choice between these filters depends on whether one prefers **edge preservation** (box filter) or **uniform smoothing** (Gaussian filter).
+    -   Such behavior is desirable when **preserving sharper edges** with less smoothing is important.
+
+-   The **Gaussian filter**, on the other hand, produces **significantly smoother edge transitions**.
+
+    -   The intensity profile transitions more gradually and smoothly around edges.
+
+    -   This type of filter is preferable when a **generally uniform smoothing effect** across the image is required.
+
+-   The choice between these filters depends on whether one prefers **edge preservation** (box filter) or **uniform smoothing** (Gaussian filter).
 
 ---
 
 The effectiveness of a **smoothing kernel** is not only determined by its size and type, but also by the **dimensions of the image** being processed. The **relative amount of blurring** produced by a given smoothing kernel **depends directly on the image size**.
-
 
 To achieve **comparable blurring** on the enlarged image (`4096 × 4096`), the size and standard deviation of the Gaussian kernel must be **scaled proportionally** to the image dimensions.
 
@@ -539,15 +535,15 @@ Let:
 
 `4096 × 4096` pixels — a fourfold increase in each spatial dimension compared to the original `1024 × 1024` image.
 
-- Original standard deviation: $\sigma = 31$
-- Scaling factor: 4
-- New standard deviation: $\sigma = 4 \times 31 = 124$
+-   Original standard deviation: $\sigma = 31$
+-   Scaling factor: 4
+-   New standard deviation: $\sigma = 4 \times 31 = 124$
 
 Thus, the appropriate kernel for the enlarged image should have:
 
-- Size: Closest odd integer to $6\sigma = 6 \times 124 = 744$, which is `745 × 745`
-- Standard deviation: $\sigma = 124$
-- Normalization constant: $K = 1$
+-   Size: Closest odd integer to $6\sigma = 6 \times 124 = 744$, which is `745 × 745`
+-   Standard deviation: $\sigma = 124$
+-   Normalization constant: $K = 1$
 
 Failure to adjust kernel size accordingly can lead to **ineffective smoothing** or **unintended filtering results**. This consideration is critical when applying spatial filtering algorithms to images of varying resolution or content scale.
 
@@ -565,21 +561,21 @@ When performing spatial filtering (such as convolution or correlation), padding 
 
 #### 1. **Zero Padding**
 
-- Pixels outside the image boundary are assumed to be zero.
-- This approach introduces **artificial black pixels**, leading to **dark borders** around the filtered image.
-- The border's thickness increases with **larger kernel sizes**.
+-   Pixels outside the image boundary are assumed to be zero.
+-   This approach introduces **artificial black pixels**, leading to **dark borders** around the filtered image.
+-   The border's thickness increases with **larger kernel sizes**.
 
 #### 2. **Mirror (Symmetric) Padding**
 
-- Pixels outside the boundary are filled by **mirror-reflecting** the image across its border.
-- This method preserves **edge continuity** and is most suitable when there are **image details near the borders**.
-- For example, if pixel values near the edge vary significantly, mirror padding avoids sharp discontinuities introduced by zero padding.
+-   Pixels outside the boundary are filled by **mirror-reflecting** the image across its border.
+-   This method preserves **edge continuity** and is most suitable when there are **image details near the borders**.
+-   For example, if pixel values near the edge vary significantly, mirror padding avoids sharp discontinuities introduced by zero padding.
 
 #### 3. **Replicate Padding**
 
-- The values outside the image are set equal to the **nearest border value** of the image.
-- Effective when the **image border regions are approximately constant** in intensity.
-- Maintains a **flat extension** of the image into the padded region.
+-   The values outside the image are set equal to the **nearest border value** of the image.
+-   Effective when the **image border regions are approximately constant** in intensity.
+-   Maintains a **flat extension** of the image into the padded region.
 
 ---
 
@@ -588,44 +584,44 @@ When performing spatial filtering (such as convolution or correlation), padding 
 > Use **mirror padding** if the border contains **image features or gradients**.
 
 ---
-### Applications of lowpass filtering 
+
+### Applications of lowpass filtering
 
 #### Region Extraction Using Lowpass Filtering
 
-The use of **lowpass filtering** followed by **intensity thresholding** to eliminate fine details and extract dominant regions. In this context, *irrelevant* refers to regions significantly smaller than the filter kernel size.
+The use of **lowpass filtering** followed by **intensity thresholding** to eliminate fine details and extract dominant regions. In this context, _irrelevant_ refers to regions significantly smaller than the filter kernel size.
 
 #### Procedure
 
-- The image was filtered using a **Gaussian kernel** of size `151 × 151` (approximately 6% of the image width) with a standard deviation of $σ = 25$. These parameters were chosen to generate a sharper, more selective Gaussian kernel compared to earlier examples.
-- The filtered output highlights **four major bright regions** while suppressing small-scale details.
-- The result of **thresholding** the filtered image using a threshold value $T = 0.4$. Only regions with intensities above the threshold were retained.
+-   The image was filtered using a **Gaussian kernel** of size `151 × 151` (approximately 6% of the image width) with a standard deviation of $σ = 25$. These parameters were chosen to generate a sharper, more selective Gaussian kernel compared to earlier examples.
+-   The filtered output highlights **four major bright regions** while suppressing small-scale details.
+-   The result of **thresholding** the filtered image using a threshold value $T = 0.4$. Only regions with intensities above the threshold were retained.
 
 This approach effectively isolates the bright regions of interest and suppresses noise or fine structures irrelevant to the application.
 
 ![alt text](/images/image39.png)
-
 
 #### Shading Correction Using Lowpass Filtering
 
 Real-world images are often affected by non-uniform lighting or sensor inhomogeneities, which appear as shading or gradual illumination differences across the image.
 **Image shading** arises primarily from **nonuniform illumination** and can adversely affect:
 
-- Quantitative measurements
-- Performance of image analysis algorithms
-- Human interpretability
+-   Quantitative measurements
+-   Performance of image analysis algorithms
+-   Human interpretability
 
-Shading correction (also known as *flat-field correction*) mitigates this by compensating for lighting nonuniformity.
+Shading correction (also known as _flat-field correction_) mitigates this by compensating for lighting nonuniformity.
 
 ![alt text](/images/image40.png)
 
 **Lowpass filtering** is a robust and simple technique for estimating shading patterns.
 
-- A `2048 × 2048` pixel **checkerboard image** with inner squares of size `128 × 128` pixels.
-- The result of applying a **Gaussian lowpass filter** with a kernel size of `512 × 512`, standard deviation `$σ = 128$` (equal to the square size), and normalization constant `$K = 1$`.
+-   A `2048 × 2048` pixel **checkerboard image** with inner squares of size `128 × 128` pixels.
+-   The result of applying a **Gaussian lowpass filter** with a kernel size of `512 × 512`, standard deviation `$σ = 128$` (equal to the square size), and normalization constant `$K = 1$`.
 
 > This kernel size is four times larger than the square size and sufficient to blur the checkerboard pattern. A kernel only three times the square size would not be adequate.
 
-- The corrected image, obtained by **dividing (a) by (b)**. Though not perfectly flat, this correction significantly improves uniformity.
+-   The corrected image, obtained by **dividing (a) by (b)**. Though not perfectly flat, this correction significantly improves uniformity.
 
 ---
 
@@ -643,8 +639,8 @@ Median filtering is especially effective for reducing **impulse noise** (also kn
 
 The **median**, $j$, of a set of $n$ values is the value such that:
 
-- Half the values are $\leq j$
-- Half the values are $\geq j$
+-   Half the values are $\leq j$
+-   Half the values are $\geq j$
 
 To apply median filtering:
 
@@ -654,8 +650,8 @@ To apply median filtering:
 
 For example:
 
-- In a `3 × 3` window, the median is the **5th** largest value.
-- In a `5 × 5` window, the median is the **13th** largest value.
+-   In a `3 × 3` window, the median is the **5th** largest value.
+-   In a `5 × 5` window, the median is the **13th** largest value.
 
 If duplicate values exist, they are treated normally during sorting.
 
@@ -679,14 +675,14 @@ Thus, the principal function of median filters is to force points to be more lik
 
 The **median filter** is by far the most useful order-statistic filter in image processing, but it is not the only one. The median corresponds to the **50th percentile** of a ranked set of numbers, but other percentiles yield different types of filters.
 
-- The **100th percentile** results in the **max filter**, which is useful for finding the brightest points in an image or for eroding dark areas adjacent to light regions.  
-  The response of a $3 \times 3$ max filter is:
+-   The **100th percentile** results in the **max filter**, which is useful for finding the brightest points in an image or for eroding dark areas adjacent to light regions.  
+    The response of a $3 \times 3$ max filter is:
 
-  ```
-  R_k = \max \{z_1, z_2, ..., z_9\}
-  ```
+    ```
+    R_k = \max \{z_1, z_2, ..., z_9\}
+    ```
 
-- The **0th percentile** filter is the **min filter**, used for the opposite purpose.
+-   The **0th percentile** filter is the **min filter**, used for the opposite purpose.
 
 ---
 
@@ -700,16 +696,18 @@ Smoothing is often referred to as **lowpass filtering**, a term borrowed from fr
 
 ---
 
-We analyze sharpening filters based on **first-order** and **second-order derivatives**. 
+We analyze sharpening filters based on **first-order** and **second-order derivatives**.
 
 Digital derivatives are defined using **differences** between pixel values. Definitions must satisfy certain fundamental conditions:
 
 #### For a First-Order Derivative:
+
 1. Must be zero in areas of constant intensity.
 2. Must be nonzero at the onset of a step or ramp.
 3. Must be nonzero along intensity ramps.
 
 #### For a Second-Order Derivative:
+
 1. Must be zero in areas of constant intensity.
 2. Must be nonzero at the onset and end of a step or ramp.
 3. Must be zero along intensity ramps.
@@ -728,7 +726,6 @@ $\frac{\partial^2 f}{\partial x^2} = f(x+1) + f(x-1) - 2f(x)$ &nbsp;&nbsp;&nbsp;
 
 These definitions satisfy the conditions necessary for discrete differentiation.
 
-
 In digital images, edges often appear as ramp-like transitions in intensity. In such cases, the first derivative produces thick edges because it remains nonzero along the ramp. Conversely, the second derivative produces a double edge that is one pixel thick, separated by zeros. From this observation, we conclude that the second derivative enhances fine detail more effectively than the first derivative, making it especially suitable for image sharpening (The second derivative clearly identifies both ends of the ramp).It outputs two narrow, sharp pulses, ideal for precise edge detection or sharpening.
 
 ![alt text](/images/image41.png)
@@ -741,11 +738,11 @@ Additionally, second derivatives require fewer operations to implement than firs
 
 ## Using the Second Derivative for Image Sharpening — The Laplacian
 
-The method involves defining a discrete approximation of the second-order derivative and constructing a corresponding filter kernel, the objective here is to use *isotropic kernels*, which yield responses that are invariant to the direction of intensity discontinuities in the image.
+The method involves defining a discrete approximation of the second-order derivative and constructing a corresponding filter kernel, the objective here is to use _isotropic kernels_, which yield responses that are invariant to the direction of intensity discontinuities in the image.
 
 It has been demonstrated (Rosenfeld and Kak [1982]) that the simplest isotropic derivative operator for a function `f(x, y)` is the **Laplacian**, defined as:
 
-$\frac{\partial^2 f}{\partial x^2} + \frac{\partial^2 f}{\partial y^2}$ 
+$\frac{\partial^2 f}{\partial x^2} + \frac{\partial^2 f}{\partial y^2}$
 
 Since derivatives of any order are linear operations, the Laplacian is itself a linear operator.
 
@@ -770,10 +767,10 @@ $\nabla^2 f(x, y) = f(x+1, y) + f(x-1, y) + f(x, y+1) + f(x, y-1) - 4f(x, y)$
 This discrete Laplacian can be implemented using convolution with the following kernel:
 
 |     |     |     |
-|-----|-----|-----|
-|  0  |  1  |  0  |
-|  1  | -4  |  1  |
-|  0  |  1  |  0  |
+| --- | --- | --- |
+| 0   | 1   | 0   |
+| 1   | -4  | 1   |
+| 0   | 1   | 0   |
 
 The kernel is **isotropic** under rotations of 90° with respect to the `x`- and `y`-axes. However, this kernel does not account for intensity changes along the **diagonal directions**. To incorporate these, we expand the discrete Laplacian definition by including four additional terms that capture diagonal intensity differences.
 
@@ -790,6 +787,7 @@ The modified Laplacian kernel is:
 This expanded kernel improves rotational symmetry and yields better isotropic behavior for edge detection and image sharpening across all directions.
 
 ### Alternate Laplacian Kernels
+
 show two additional commonly used Laplacian kernels. These are derived from **negative definitions** of the second derivatives compared to those used earlier. Although they produce equivalent results, **the sign of the coefficients is inverted**, which must be carefully considered when **combining a Laplacian-filtered image with the original**.
 
 The negative Laplacian kernel corresponding is:
@@ -811,26 +809,28 @@ And the negative isotropic kernel corresponding is:
 -1  -1  -1
 
 ```
+
 Because the Laplacian is a derivative operator, it **emphasizes sharp intensity transitions** within an image while **de-emphasizing regions of slowly varying intensities**. As a result, the output often consists of grayish edge lines and other discontinuities superimposed on a dark, largely featureless background.
 
 To **preserve the original image features** while maintaining the sharpening effect of the Laplacian, the Laplacian-filtered image is added back to the original image. It is critical to be aware of the sign convention of the Laplacian kernel used:
 
-- If the Laplacian kernel has a **negative center coefficient**, the sharpened image is obtained by **subtracting** the Laplacian from the original image.
-- If the kernel has a **positive center coefficient** , the Laplacian is **added** to the original image.
+-   If the Laplacian kernel has a **negative center coefficient**, the sharpened image is obtained by **subtracting** the Laplacian from the original image.
+-   If the kernel has a **positive center coefficient** , the Laplacian is **added** to the original image.
 
 Formally, the sharpening operation is expressed as:
 
 $g(x,y) = f(x,y) + c \cdot \nabla^2 f(x,y)$
 
-where:  
-- `f(x,y)` is the original input image,  
-- `g(x,y)` is the sharpened output image,  
-- $\nabla^2 f(x,y)$ denotes the Laplacian of the image, and  
-- `c` is a scalar constant defined as  
-  - `c = -1` if using the kernels is negative center coefficient,  
-  - `c = 1` if using the kernels in positive center coefficient.
+where:
 
-This approach ensures proper image sharpening consistent with the sign convention of the discrete Laplacian kernel applied.  
+-   `f(x,y)` is the original input image,
+-   `g(x,y)` is the sharpened output image,
+-   $\nabla^2 f(x,y)$ denotes the Laplacian of the image, and
+-   `c` is a scalar constant defined as
+    -   `c = -1` if using the kernels is negative center coefficient,
+    -   `c = 1` if using the kernels in positive center coefficient.
+
+This approach ensures proper image sharpening consistent with the sign convention of the discrete Laplacian kernel applied.
 
 The coefficients of each Laplacian kernel sum to zero. Since convolution-based filtering computes a sum of products, when a derivative kernel is applied to a constant region in an image, the convolution result at that location must be zero. This is precisely achieved by using kernels whose coefficients sum to zero.
 
@@ -838,5 +838,7 @@ In contrast, smoothing kernels are normalized so that the sum of their coefficie
 
 However, when convolving an image with a kernel whose coefficients sum to zero, the sum of pixel values in the filtered image will also be zero. This implies that the filtered image may contain negative values and often requires additional processing to produce visually suitable results. One such example is adding the filtered image back to the original image.
 
->  An image is filtered with a kernel whose coefficients sum to zero. Then the sum of the pixel values in the filtered image also is zero.
+> If an image is filtered with a kernel whose coefficients sum to zero. Then the sum of the pixel values in the filtered image also is zero.
+
+---
 
