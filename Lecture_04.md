@@ -260,7 +260,6 @@ However, box filters exhibit several important limitations that make them **unsu
 
 In imaging systems, a **defocused lens** behaves as a **lowpass filter**. However, box filters fail to replicate the **blurring characteristics** observed in such optical scenarios.
 
-> **Problem 3.33:**  
 > A single point of light can be modeled by a digital image consisting of all `0`s, with a single `1` located at the position of the light point.  
 > When viewed through a **defocused lens**, this point appears as a **fuzzy blob**, the size of which increases with the degree of defocus.
 >
@@ -696,6 +695,50 @@ Smoothing is often referred to as **lowpass filtering**, a term borrowed from fr
 
 ---
 
+## Definition of Filter Masks
+
+In image processing, derivative approximations are implemented using **discrete filter masks**. These masks correspond to finite difference formulas, centered at a specific point `x`. We assume `h = 1` for simplicity.
+
+---
+
+### 1. Forward Difference Approximation
+
+This estimates the first derivative using the point ahead:
+
+$\frac{f(x + h) - f(x)}{h} \rightarrow \frac{1}{h}$
+
+h = 1
+
+$f(x+1) - f(x) = (-1) \cdot f(x) + (1) \cdot f(x+1)$
+
+This is equivalent to convolving the image with the following kernel / **Filter mask:** `[0 -1 1]` :
+This kernel is the discrete implementation of the forward derivative.
+
+### 2. Backward Difference Approximation
+
+This estimates the derivative using the point behind:
+
+$\frac{f(x) - f(x - h)}{h} \rightarrow \frac{1}{h}$
+
+**Filter mask:** `[1 -1 0]`
+
+### 3. Central Difference Approximation
+
+This averages the forward and backward differences:
+
+$\frac{f(x + h) - f(x - h)}{2h} \rightarrow \frac{1}{2h}$
+
+**Filter mask:** : `[-1 0 1]`
+
+These masks operate by convolving over the image to compute derivatives.
+
+All the above derivative approximations correspond to **linear filters**, meaning they satisfy:
+
+-   **Additivity:** `D(f + g) = D(f) + D(g)`
+-   **Homogeneity:** `D(c · f) = c · D(f)`
+
+---
+
 We analyze sharpening filters based on **first-order** and **second-order derivatives**.
 
 Digital derivatives are defined using **differences** between pixel values. Definitions must satisfy certain fundamental conditions:
@@ -841,4 +884,3 @@ However, when convolving an image with a kernel whose coefficients sum to zero, 
 > If an image is filtered with a kernel whose coefficients sum to zero. Then the sum of the pixel values in the filtered image also is zero.
 
 ---
-
