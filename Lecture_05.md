@@ -253,6 +253,7 @@ Derivatives of a digital function are defined in terms of **finite differences**
 
 Given that we are working with **digital quantities** (i.e., finite values), the maximum possible change in intensity is finite, and the shortest interval over which this change can occur is **between adjacent pixels**.
 
+---
 #### Taylor Series Expansion
 
 An approximation to the first derivative at an arbitrary point $x$ in a one-dimensional function $f(x)$ can be derived by expanding $f(x + \Delta x)$ into a **Taylor series** about $x$:
