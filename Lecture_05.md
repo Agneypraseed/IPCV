@@ -269,7 +269,7 @@ For practical digital processing, the separation $\Delta x$ between samples is m
 -   When $\Delta x = 1$, Equation becomes:
 
 $$
-f(x + 1) = f(x) + \frac{\partial f(x)}{\partial x} + \frac{\partial^2 f(x)}{\partial x^2} \frac{1}{2!} + \frac{\partial^3 f(x)}{\partial x^3} \frac{1}{3!} + \cdots
+f(x + 1) = f(x) + \frac{\partial f(x)}{\partial x} + \frac{\partial^2 f(x)}{\partial x^2} \frac{1}{2!} + \frac{\partial^3 f(x)}{\partial x^3} \frac{1}{3!} + \cdots \qquad (10-2)
 $$
 
 -   Similarly, when $\Delta x = -1$:
