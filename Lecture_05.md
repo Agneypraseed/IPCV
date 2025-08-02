@@ -138,25 +138,27 @@ These subregions must satisfy the following conditions:
 3. **Disjointness**  
    The regions must be mutually exclusive:
 
-    ```
+    ``
     Rᵢ ∩ Rⱼ = ∅, for all i ≠ j
-    ```
+    ``
 
 4. **Homogeneity**  
    A logical predicate `Q(Rᵢ)` must be satisfied by all pixels in region `Rᵢ`:
 
-    ```
+    ``
     Q(Rᵢ) = TRUE, for all i ∈ {1, 2, ..., n}
-    ```
+    ``
 
     This predicate defines a property such as intensity uniformity, texture similarity, etc.
     Each region must satisfy a given property (defined by the predicate Q).
 
 5. **Maximality**  
    For any pair of adjacent regions `Rᵢ` and `Rⱼ`, the predicate `Q` must fail when applied to their union:
-    ```
+
+    ``
     Q(Rᵢ ∪ Rⱼ) = FALSE, if Rᵢ and Rⱼ are adjacent
-    ```
+    ``
+    
     Two regions are adjacent if their union forms a connected set.
 
 ---
