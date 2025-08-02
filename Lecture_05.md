@@ -517,9 +517,9 @@ This procedure **measures weighted differences** between a pixel and its 8-neigh
 - **(b):** Result of filtering the image using the **Laplacian kernel**.
 - **(c):** Result of thresholding with:
 
-  $$
+  $
   T = 0.9 \cdot \max\left(|Z(x, y)|\right)
-  $$
+  $
 
 - The **isolated pixel** is clearly visible at the **tip of the arrow** (enlarged for visibility).
 
