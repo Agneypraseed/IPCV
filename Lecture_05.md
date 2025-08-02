@@ -111,18 +111,16 @@ These subregions must satisfy the following conditions:
 1. **Completeness**  
    Every pixel in the image must belong to a region:
 
-    ``
-    R = R₁ ∪ R₂ ∪ ... ∪ Rₙ
-    ``
+    ` R = R₁ ∪ R₂ ∪ ... ∪ Rₙ
+`
 
     This ensures that the segmentation fully covers the spatial domain.
 
 2. **Connectivity**  
    Each region `Rᵢ` must be a connected set:
 
-    ``
-    Rᵢ is connected, for all i ∈ {1, 2, ..., n}
-    ``
+    ` Rᵢ is connected, for all i ∈ {1, 2, ..., n}
+`
 
     Connectivity means that every pixel in a region `R_i` is reachable from any other pixel in `R_i` **by a path that stays entirely within the region**.
 
@@ -138,16 +136,14 @@ These subregions must satisfy the following conditions:
 3. **Disjointness**  
    The regions must be mutually exclusive:
 
-    ``
-    Rᵢ ∩ Rⱼ = ∅, for all i ≠ j
-    ``
+    ` Rᵢ ∩ Rⱼ = ∅, for all i ≠ j
+`
 
 4. **Homogeneity**  
    A logical predicate `Q(Rᵢ)` must be satisfied by all pixels in region `Rᵢ`:
 
-    ``
-    Q(Rᵢ) = TRUE, for all i ∈ {1, 2, ..., n}
-    ``
+    ` Q(Rᵢ) = TRUE, for all i ∈ {1, 2, ..., n}
+`
 
     This predicate defines a property such as intensity uniformity, texture similarity, etc.
     Each region must satisfy a given property (defined by the predicate Q).
@@ -155,10 +151,9 @@ These subregions must satisfy the following conditions:
 5. **Maximality**  
    For any pair of adjacent regions `Rᵢ` and `Rⱼ`, the predicate `Q` must fail when applied to their union:
 
-    ``
-    Q(Rᵢ ∪ Rⱼ) = FALSE, if Rᵢ and Rⱼ are adjacent
-    ``
-    
+    ` Q(Rᵢ ∪ Rⱼ) = FALSE, if Rᵢ and Rⱼ are adjacent
+`
+
     Two regions are adjacent if their union forms a connected set.
 
 ---
@@ -256,6 +251,7 @@ Derivatives of a digital function are defined in terms of **finite differences**
 Given that we are working with **digital quantities** (i.e., finite values), the maximum possible change in intensity is finite, and the shortest interval over which this change can occur is **between adjacent pixels**.
 
 ---
+
 #### Taylor Series Expansion
 
 An approximation to the first derivative at an arbitrary point $x$ in a one-dimensional function $f(x)$ can be derived by expanding $f(x + \Delta x)$ into a **Taylor series** about $x$:
@@ -416,10 +412,10 @@ As we traverse this profile from left to right, the following properties are obs
     - The **second-order derivative** produces a **stronger response** than the first-order derivative.
     - This is expected, since second-order derivatives **amplify sharp intensity changes** more aggressively, including **fine details and noise**.
 3. **Thin Line**:
+
     - Again, the **second derivative response is stronger**, further confirming its sensitivity to such features.
     - This type of pattern produces a roof edge in the intensity profile, characterized by a narrow peak or ridge surrounded by symmetric slopes.
     - The second derivative shows a distinct positive–negative–positive pattern around the peak, creating a double-edge effect that helps localize both sides of the line.
-
 
 4. **Step Edge**:
     - For both **ramp** and **step edges**, the **second-order derivative exhibits opposite signs** as it enters and exits the edge region.
@@ -461,6 +457,7 @@ Where:
 This convolution-based approach applies to any linear filter used for computing local derivatives across the image.
 
 ---
+
 ### Detection of Isolated Points Using the Laplacian
 
 **Point detection** should be based on the **second-order derivative**, which is implemented using the **Laplacian operator**:
@@ -476,14 +473,42 @@ $$
 \text{ (Eq 10-14)}
 $$
 
-This expression can be implemented using the **Laplacian kernel** 
+There are **two common versions** of the 2D Laplacian operator, based on how many neighbors they use:
 
-`````
-1   1   1
-1  -8   1
-1   1   1
-`````
+---
 
+### 1. **4-Connected Laplacian** (Only vertical and horizontal neighbors)
+
+$\nabla^2 f(x, y) = f(x+1,y) + f(x-1,y) + f(x,y+1) + f(x,y-1) - 4f(x, y)$
+
+Corresponding kernel:
+
+$$
+\begin{bmatrix}
+0 & 1 & 0 \\
+1 & -4 & 1 \\
+0 & 1 & 0
+\end{bmatrix}
+$$
+
+---
+
+### 2. **8-Connected Laplacian** (Includes diagonals too)
+
+$\nabla^2 f(x, y) = \sum_{\text{all 8 neighbors}} f(x+i, y+j) - 8f(x, y)$
+
+Corresponding kernel:
+
+$$
+\begin{bmatrix}
+1 & 1 & 1 \\
+1 & -8 & 1 \\
+1 & 1 & 1
+\end{bmatrix}
+$$
+
+- The **−4 version** is simpler and less sensitive to diagonal structures.  
+- The **−8 version** gives a **stronger and more symmetrical response**, especially useful for detecting **points and lines** in all directions.
 ---
 
 ### Point Detection via Thresholding
@@ -500,9 +525,9 @@ $$
 
 Where:
 
-- \( g(x, y) \) is the binary output image,
-- \( Z(x, y) \) is the response computed using spatial convolution,
-- \( T \) is the threshold.
+-   \( g(x, y) \) is the binary output image,
+-   \( Z(x, y) \) is the response computed using spatial convolution,
+-   \( T \) is the threshold.
 
 This procedure **measures weighted differences** between a pixel and its 8-neighbors. The intuition is that the **intensity of an isolated point** differs significantly from its neighborhood, making it detectable by this kernel. The kernel coefficients sum to zero, ensuring that **areas of constant intensity produce a zero response**, as is typical for derivative filters.
 
@@ -512,17 +537,58 @@ This procedure **measures weighted differences** between a pixel and its 8-neigh
 
 ![alt text](/images/image53.png)
 
-- **(a)** An X-ray image of a **turbine blade** from a jet engine.
-- The blade exhibits **porosity**, shown as a **single black pixel** in the upper-right quadrant.
-- **(b):** Result of filtering the image using the **Laplacian kernel**.
-- **(c):** Result of thresholding with:
+-   **(a)** An X-ray image of a **turbine blade** from a jet engine.
+-   The blade exhibits **porosity**, shown as a **single black pixel** in the upper-right quadrant.
+-   **(b):** Result of filtering the image using the **Laplacian kernel**.
+-   **(c):** Result of thresholding with:
 
-  $${T = 0.9 \cdot \max\left(|Z(x, y)|\right)}$$
+    $${T = 0.9 \cdot \max\left(|Z(x, y)|\right)}$$
 
-- The **isolated pixel** is clearly visible at the **tip of the arrow** (enlarged for visibility).
+-   The **isolated pixel** is clearly visible at the **tip of the arrow** (enlarged for visibility).
 
 This method is effective when **intensity changes occur abruptly** at **single-pixel locations**, surrounded by a **homogeneous background**. When this condition is not satisfied, **other edge or region detection methods** are more appropriate.
 
 ---
 
-<pre> ```latex \text{SNR}_{\max} = \frac{\max_{x,y} f(x, y)^2}{\text{MSE}(f, g)} ``` </pre>
+### Line Detection
+
+**Second-order derivatives** provide a stronger response and yield **thinner line representations** than first-order derivatives. Therefore, the **Laplacian kernel** is also applicable for detecting lines. However, care must be taken to manage the **double-line effect** produced by second derivatives.
+
+---
+
+### Using the Laplacian for Line Detection
+
+-   **Figure 10.5(a)** shows a `486 × 486` binary portion of a **wire-bond mask** for an electronic circuit.
+-   **Figure 10.5(b)** presents its **Laplacian-transformed image**. Since the Laplacian output includes **negative values**, **scaling** is necessary for display.
+    -   In this image:
+        -   **Mid gray** denotes zero.
+        -   **Darker shades** indicate negative values.
+        -   **Lighter shades** indicate positive values.
+    -   The **double-line effect** is evident in the magnified view of the image.
+
+---
+
+### Handling the Laplacian Output
+
+A naive approach might suggest taking the **absolute value** of the Laplacian image to mitigate the presence of negative values. However:
+
+-   **Figure 10.5(c)** demonstrates that this approach **doubles the line thickness**, which is generally undesirable.
+-   A **better approach** is to use **only the positive values** of the Laplacian image.
+    -   In **noisy images**, apply a **positive threshold** to ignore minor fluctuations around zero.
+-   **Figure 10.5(d)** shows that this **selective positive filtering** yields **thinner and more accurate line detections**.
+
+---
+
+### Considerations on Line Width and Kernel Size
+
+-   Observe that in **Figures 10.5(b)–(d)**, wide lines (relative to the kernel size) exhibit a **zero “valley”** between the edges of the lines.
+    -   This occurs because when a `3 × 3` kernel is centered on a line of **constant intensity** and **width of 5 pixels**, the filter response is **zero**, creating the observed effect.
+
+Thus, for effective line detection:
+
+-   **Assume lines are thin** relative to the detector's kernel.
+-   **Wide lines** should instead be considered as **regions**, and processed using the **edge detection techniques** discussed in the following section.
+
+---
+
+![alt text](/images/image54.png)
