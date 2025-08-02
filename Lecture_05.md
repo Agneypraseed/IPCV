@@ -111,18 +111,18 @@ These subregions must satisfy the following conditions:
 1. **Completeness**  
    Every pixel in the image must belong to a region:
 
-    ```
+    ``
     R = R₁ ∪ R₂ ∪ ... ∪ Rₙ
-    ```
+    ``
 
     This ensures that the segmentation fully covers the spatial domain.
 
 2. **Connectivity**  
    Each region `Rᵢ` must be a connected set:
 
-    ```
+    ``
     Rᵢ is connected, for all i ∈ {1, 2, ..., n}
-    ```
+    ``
 
     Connectivity means that every pixel in a region `R_i` is reachable from any other pixel in `R_i` **by a path that stays entirely within the region**.
 
@@ -457,3 +457,62 @@ Where:
 -   $w_k$ is the corresponding **kernel coefficient**.
 
 This convolution-based approach applies to any linear filter used for computing local derivatives across the image.
+
+---
+### Detection of Isolated Points Using the Laplacian
+
+**Point detection** should be based on the **second-order derivative**, which is implemented using the **Laplacian operator**:
+
+$$
+\nabla^2 f = \frac{\partial^2 f}{\partial x^2} + \frac{\partial^2 f}{\partial y^2}
+$$
+
+The partial derivatives are computed using the **second-order finite differences** from Eqs. (10-10) and (10-11). Substituting those into the Laplacian yields:
+
+$$
+\nabla^2 f(x, y) = f(x+1, y) + f(x-1, y) + f(x, y+1) + f(x, y-1) - 4f(x, y)
+\tag{10-14}
+$$
+
+This expression can be implemented using the **Laplacian kernel** shown in **Fig. 10.4(a)** in Example 10.1.
+
+---
+
+### Point Detection via Thresholding
+
+We consider that a **point has been detected** at a location \( (x, y) \) if the **absolute value of the filter response** at that point exceeds a specified **non-negative threshold** \( T \). The output image is then binary, where detected points are labeled `1`, and all others `0`:
+
+$$
+g(x, y) =
+\begin{cases}
+1 & \text{if } |Z(x, y)| > T \\
+0 & \text{otherwise}
+\end{cases}
+\tag{10-15}
+$$
+
+Where:
+
+- \( g(x, y) \) is the binary output image,
+- \( Z(x, y) \) is the response computed using spatial convolution (Eq. 10-12),
+- \( T \) is the threshold.
+
+This procedure **measures weighted differences** between a pixel and its 8-neighbors. The intuition is that the **intensity of an isolated point** differs significantly from its neighborhood, making it detectable by this kernel. The kernel coefficients sum to zero, ensuring that **areas of constant intensity produce a zero response**, as is typical for derivative filters.
+
+---
+
+### Example: Detection of Isolated Points in an Image
+
+- **Figure 10.4(b):** An X-ray image of a **turbine blade** from a jet engine.
+- The blade exhibits **porosity**, shown as a **single black pixel** in the upper-right quadrant.
+- **Figure 10.4(c):** Result of filtering the image using the **Laplacian kernel**.
+- **Figure 10.4(d):** Result of thresholding using Eq. (10-15) with:
+
+  $$
+  T = 0.9 \cdot \max\left(|Z(x, y)|\right)
+  $$
+
+- The **isolated pixel** is clearly visible at the **tip of the arrow** (enlarged for visibility).
+
+This method is effective when **intensity changes occur abruptly** at **single-pixel locations**, surrounded by a **homogeneous background**. When this condition is not satisfied, **other edge or region detection methods** discussed in this chapter are more appropriate.
+
