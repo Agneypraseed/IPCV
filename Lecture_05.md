@@ -473,10 +473,16 @@ The partial derivatives are computed using the **second-order finite differences
 
 $$
 \nabla^2 f(x, y) = f(x+1, y) + f(x-1, y) + f(x, y+1) + f(x, y-1) - 4f(x, y)
-\tag{10-14}
+\text{ (Eq 10-14)}
 $$
 
-This expression can be implemented using the **Laplacian kernel** shown in **Fig. 10.4(a)** in Example 10.1.
+This expression can be implemented using the **Laplacian kernel** 
+
+`````
+1   1   1
+1  -8   1
+1   1   1
+`````
 
 ---
 
@@ -490,13 +496,12 @@ g(x, y) =
 1 & \text{if } |Z(x, y)| > T \\
 0 & \text{otherwise}
 \end{cases}
-\tag{10-15}
 $$
 
 Where:
 
 - \( g(x, y) \) is the binary output image,
-- \( Z(x, y) \) is the response computed using spatial convolution (Eq. 10-12),
+- \( Z(x, y) \) is the response computed using spatial convolution,
 - \( T \) is the threshold.
 
 This procedure **measures weighted differences** between a pixel and its 8-neighbors. The intuition is that the **intensity of an isolated point** differs significantly from its neighborhood, making it detectable by this kernel. The kernel coefficients sum to zero, ensuring that **areas of constant intensity produce a zero response**, as is typical for derivative filters.
@@ -505,10 +510,12 @@ This procedure **measures weighted differences** between a pixel and its 8-neigh
 
 ### Example: Detection of Isolated Points in an Image
 
-- **Figure 10.4(b):** An X-ray image of a **turbine blade** from a jet engine.
+![alt text](/images/image53.png)
+
+- **(a)** An X-ray image of a **turbine blade** from a jet engine.
 - The blade exhibits **porosity**, shown as a **single black pixel** in the upper-right quadrant.
-- **Figure 10.4(c):** Result of filtering the image using the **Laplacian kernel**.
-- **Figure 10.4(d):** Result of thresholding using Eq. (10-15) with:
+- **(b):** Result of filtering the image using the **Laplacian kernel**.
+- **(c):** Result of thresholding with:
 
   $$
   T = 0.9 \cdot \max\left(|Z(x, y)|\right)
@@ -516,5 +523,7 @@ This procedure **measures weighted differences** between a pixel and its 8-neigh
 
 - The **isolated pixel** is clearly visible at the **tip of the arrow** (enlarged for visibility).
 
-This method is effective when **intensity changes occur abruptly** at **single-pixel locations**, surrounded by a **homogeneous background**. When this condition is not satisfied, **other edge or region detection methods** discussed in this chapter are more appropriate.
+This method is effective when **intensity changes occur abruptly** at **single-pixel locations**, surrounded by a **homogeneous background**. When this condition is not satisfied, **other edge or region detection methods** are more appropriate.
+
+---
 
