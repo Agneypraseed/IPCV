@@ -73,7 +73,7 @@ $\text{MSE}(f, g) = \frac{1}{M \cdot N} \sum_{i=1}^{M} \sum_{j=1}^{N} \left[ f(i
 
 The **Signal-to-Noise Ratio** compares the maximum pixel intensity in the image to the noise energy.
 
-${\text{SNR}_{\text{max}} = \frac{\max_{x,y} f(x, y)^2}{\text{MSE}(f, g)}}$
+$\text{SNR}_{\text{max}} = \frac{\max_{x,y} f(x, y)^2}{\text{MSE}(f, g)}$
 
 -   A higher SNR value indicates better visual quality.
 -   This ratio is unitless and represents relative signal strength.
