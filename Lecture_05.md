@@ -269,14 +269,14 @@ For practical digital processing, the separation $\Delta x$ between samples is m
 -   When $\Delta x = 1$, Equation becomes:
 
 $$
-f(x + 1) = f(x) + \frac{\partial f(x)}{\partial x} + \frac{\partial^2 f(x)}{\partial x^2} \frac{1}{2!} + \frac{\partial^3 f(x)}{\partial x^3} \frac{1}{3!} + \cdots \qquad (10-2)
+f(x + 1) = f(x) + \frac{\partial f(x)}{\partial x} + \frac{\partial^2 f(x)}{\partial x^2} \frac{1}{2!} + \frac{\partial^3 f(x)}{\partial x^3} \frac{1}{3!} + \cdots \qquad (Eq 10-2)
 $$
 
 -   Similarly, when $\Delta x = -1$:
 
 $$
 f(x - 1) = f(x) - \frac{\partial f(x)}{\partial x} + \frac{\partial^2 f(x)}{\partial x^2} \frac{1}{2!} - \frac{\partial^3 f(x)}{\partial x^3} \frac{1}{3!} + \cdots
-\tag{10-3}
+\qquad (Eq 10-3)
 $$
 
 #### Finite Difference Approximations
@@ -287,21 +287,21 @@ By retaining only the **linear terms** in the series expansions above, we can fo
 
 $$
 \frac{\partial f(x)}{\partial x} \approx f(x + 1) - f(x)
-\tag{10-4}
+\qquad (Eq 10-4)
 $$
 
 -   **Backward difference** (from Eq. 10-3):
 
 $$
 \frac{\partial f(x)}{\partial x} \approx f(x) - f(x - 1)
-\tag{10-5}
+\qquad (Eq 10-5)
 $$
 
 -   **Central difference** (obtained by subtracting Eq. 10-3 from Eq. 10-2):
 
 $$
 \frac{\partial f(x)}{\partial x} \approx \frac{f(x + 1) - f(x - 1)}{2}
-\tag{10-6}
+\qquad (Eq 10-6)
 $$
 
 #### Error Considerations
@@ -323,21 +323,21 @@ The **second-order derivative** based on a **central difference**, denoted by $\
 
 $$
 \frac{\partial^2 f(x)}{\partial x^2} \approx f(x+1) + f(x-1) - 2f(x)
-\tag{10-7}
+\qquad (Eq 10-7)
 $$
 
 To compute the **third-order central derivative**, one additional point on each side of $x$ is required. Specifically, we expand $f(x+2)$ and $f(x-2)$ using the Taylor series with $\Delta x = 2$ and $\Delta x = -2$, respectively. By combining these expansions and **eliminating all derivatives of order less than three**, the third-order approximation (ignoring higher-order terms) is given by :
 
 $$
 \frac{\partial^3 f(x)}{\partial x^3} \approx -f(x+2) + 2f(x+1) - 2f(x-1) + f(x-2)
-\tag{10-8}
+\qquad (Eq 10-8)
 $$
 
 Similarly, the **fourth-order finite difference**, which is the highest derivative considered in the text, is derived using additional Taylor expansions and eliminating terms up to the third order. The result is:
 
 $$
 \frac{\partial^4 f(x)}{\partial x^4} \approx f(x+2) - 4f(x+1) + 6f(x) - 4f(x-1) + f(x-2)
-\tag{10-9}
+\qquad (Eq 10-9)
 $$
 
 ### Summary of Central Difference Formulas
@@ -354,14 +354,14 @@ For functions of **two variables**, the same central difference formulas are app
 
 $$
 \frac{\partial^2 f(x, y)}{\partial x^2} \approx f(x+1, y) + f(x-1, y) - 2f(x, y)
-\tag{10-10}
+\qquad (Eq 10-10)
 $$
 
 -   Second derivative with respect to $y$:
 
 $$
 \frac{\partial^2 f(x, y)}{\partial y^2} \approx f(x, y+1) + f(x, y-1) - 2f(x, y)
-\tag{10-11}
+\qquad (Eq 10-11)
 $$
 
 These approximations are consistent with the properties required of first- and second-order derivatives.
