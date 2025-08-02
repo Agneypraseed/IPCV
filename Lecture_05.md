@@ -525,3 +525,4 @@ This method is effective when **intensity changes occur abruptly** at **single-p
 
 ---
 
+<pre> ```latex \text{SNR}_{\max} = \frac{\max_{x,y} f(x, y)^2}{\text{MSE}(f, g)} ``` </pre>
