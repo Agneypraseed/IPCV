@@ -108,53 +108,58 @@ R₁, R₂, ..., Rₙ
 
 These subregions must satisfy the following conditions:
 
-1. **Completeness**  
-   Every pixel in the image must belong to a region:
+1.  **Completeness**  
+     Every pixel in the image must belong to a region:
 
-    ` R = R₁ ∪ R₂ ∪ ... ∪ Rₙ
-`
+        ` R = R₁ ∪ R₂ ∪ ... ∪ Rₙ
 
-    This ensures that the segmentation fully covers the spatial domain.
+    `
 
-2. **Connectivity**  
-   Each region `Rᵢ` must be a connected set:
+        This ensures that the segmentation fully covers the spatial domain.
 
-    ` Rᵢ is connected, for all i ∈ {1, 2, ..., n}
-`
+2.  **Connectivity**  
+     Each region `Rᵢ` must be a connected set:
 
-    Connectivity means that every pixel in a region `R_i` is reachable from any other pixel in `R_i` **by a path that stays entirely within the region**.
+        ` Rᵢ is connected, for all i ∈ {1, 2, ..., n}
 
-    A set of pixels is **connected** if there exists a path (within the region) between any two pixels in that set. This path must obey a selected **connectivity rule**, commonly one of the following:
+    `
 
-    - **4-connectivity**: A pixel is connected to its immediate horizontal and vertical neighbors only.
-    - **8-connectivity**: A pixel is connected to all 8 of its immediate neighbors (including diagonal neighbors).
+        Connectivity means that every pixel in a region `R_i` is reachable from any other pixel in `R_i` **by a path that stays entirely within the region**.
 
-    The type of connectivity must be predefined.
+        A set of pixels is **connected** if there exists a path (within the region) between any two pixels in that set. This path must obey a selected **connectivity rule**, commonly one of the following:
 
-    Without enforcing connectedness, a region might consist of scattered, unrelated pixels — which is typically **not meaningful** for segmentation or analysis.
+        - **4-connectivity**: A pixel is connected to its immediate horizontal and vertical neighbors only.
+        - **8-connectivity**: A pixel is connected to all 8 of its immediate neighbors (including diagonal neighbors).
 
-3. **Disjointness**  
-   The regions must be mutually exclusive:
+        The type of connectivity must be predefined.
 
-    ` Rᵢ ∩ Rⱼ = ∅, for all i ≠ j
-`
+        Without enforcing connectedness, a region might consist of scattered, unrelated pixels — which is typically **not meaningful** for segmentation or analysis.
 
-4. **Homogeneity**  
-   A logical predicate `Q(Rᵢ)` must be satisfied by all pixels in region `Rᵢ`:
+3.  **Disjointness**  
+     The regions must be mutually exclusive:
 
-    ` Q(Rᵢ) = TRUE, for all i ∈ {1, 2, ..., n}
-`
+        ` Rᵢ ∩ Rⱼ = ∅, for all i ≠ j
 
-    This predicate defines a property such as intensity uniformity, texture similarity, etc.
-    Each region must satisfy a given property (defined by the predicate Q).
+    `
 
-5. **Maximality**  
-   For any pair of adjacent regions `Rᵢ` and `Rⱼ`, the predicate `Q` must fail when applied to their union:
+4.  **Homogeneity**  
+     A logical predicate `Q(Rᵢ)` must be satisfied by all pixels in region `Rᵢ`:
 
-    ` Q(Rᵢ ∪ Rⱼ) = FALSE, if Rᵢ and Rⱼ are adjacent
-`
+        ` Q(Rᵢ) = TRUE, for all i ∈ {1, 2, ..., n}
 
-    Two regions are adjacent if their union forms a connected set.
+    `
+
+        This predicate defines a property such as intensity uniformity, texture similarity, etc.
+        Each region must satisfy a given property (defined by the predicate Q).
+
+5.  **Maximality**  
+     For any pair of adjacent regions `Rᵢ` and `Rⱼ`, the predicate `Q` must fail when applied to their union:
+
+        ` Q(Rᵢ ∪ Rⱼ) = FALSE, if Rᵢ and Rⱼ are adjacent
+
+    `
+
+        Two regions are adjacent if their union forms a connected set.
 
 ---
 
@@ -507,8 +512,9 @@ $$
 \end{bmatrix}
 $$
 
-- The **−4 version** is simpler and less sensitive to diagonal structures.  
-- The **−8 version** gives a **stronger and more symmetrical response**, especially useful for detecting **points and lines** in all directions.
+-   The **−4 version** is simpler and less sensitive to diagonal structures.
+-   The **−8 version** gives a **stronger and more symmetrical response**, especially useful for detecting **points and lines** in all directions.
+
 ---
 
 ### Point Detection via Thresholding
@@ -558,37 +564,134 @@ This method is effective when **intensity changes occur abruptly** at **single-p
 
 ### Using the Laplacian for Line Detection
 
--   **Figure 10.5(a)** shows a `486 × 486` binary portion of a **wire-bond mask** for an electronic circuit.
--   **Figure 10.5(b)** presents its **Laplacian-transformed image**. Since the Laplacian output includes **negative values**, **scaling** is necessary for display.
+![alt text](/images/image55.png)
+
+-   **(a)** shows a `486 × 486` binary portion of a **wire-bond mask** for an electronic circuit.
+-   **(b)** presents its **Laplacian-transformed image**. Since the Laplacian output includes **negative values**, **scaling** is necessary for display.
     -   In this image:
         -   **Mid gray** denotes zero.
         -   **Darker shades** indicate negative values.
         -   **Lighter shades** indicate positive values.
-    -   The **double-line effect** is evident in the magnified view of the image.
+    -   The **double-line effect** (one light stripe, one dark stripe) is evident in the magnified view of the image.
 
 ---
 
 ### Handling the Laplacian Output
 
-A naive approach might suggest taking the **absolute value** of the Laplacian image to mitigate the presence of negative values. However:
+A naive approach might suggest taking the **absolute value**
+of the Laplacian image to mitigate the presence of negative values. However:
 
--   **Figure 10.5(c)** demonstrates that this approach **doubles the line thickness**, which is generally undesirable.
+-   **(c)** : ∣Laplacian(x,y)∣ demonstrates that this approach **doubles the line thickness**, which is generally undesirable.
 -   A **better approach** is to use **only the positive values** of the Laplacian image.
     -   In **noisy images**, apply a **positive threshold** to ignore minor fluctuations around zero.
--   **Figure 10.5(d)** shows that this **selective positive filtering** yields **thinner and more accurate line detections**.
+-   **(d)** : if Laplacian(x,y)>T, keep it; else 0
+    -   This method shows that this **selective positive filtering** yields **thinner and more accurate line detections**.
 
 ---
 
 ### Considerations on Line Width and Kernel Size
 
--   Observe that in **Figures 10.5(b)–(d)**, wide lines (relative to the kernel size) exhibit a **zero “valley”** between the edges of the lines.
+-   Observe that in **(b)–(d)**, wide lines (relative to the kernel size) exhibit a **zero “valley”** between the edges of the lines.
     -   This occurs because when a `3 × 3` kernel is centered on a line of **constant intensity** and **width of 5 pixels**, the filter response is **zero**, creating the observed effect.
+    -   zero valley —> a flat region the Laplacian ignores because it has no local intensity change.
+    -   Ex : ![alt text](/images/image56.png)
 
-Thus, for effective line detection:
+So, line detection works best when the kernel can "wrap around" the entire line:
 
 -   **Assume lines are thin** relative to the detector's kernel.
--   **Wide lines** should instead be considered as **regions**, and processed using the **edge detection techniques** discussed in the following section.
+-   If the line is too wide, like 3+ pixels, the center becomes flat — it looks like a region, not an edge.
+-   **Wide lines** should instead be considered as **regions**, and processed using the **edge detection techniques**
 
 ---
 
+### Directional Line Detection Using Kernels
+
+The **Laplacian detector kernel** is **isotropic**, meaning its response is independent of direction—across vertical, horizontal, and diagonal orientations in a `3 × 3` neighborhood. However, in many applications, the goal is to **detect lines oriented in specific directions**.
+
+---
+
+### Directional Kernels
+
+![alt text](/images/image57.png)
+
+When an image with a constant background and embedded lines oriented at `0°`, `±45°`, and `90°` is filtered with each kernel, the **maximum response** occurs when a line of interest aligns with the **preferred orientation** of the kernel:
+
+-   The **first kernel** responds maximally to **horizontal lines** (0°).
+-   The **second kernel** to **+45° diagonal lines**.
+-   The **third kernel** to **vertical lines** (90°).
+-   The **fourth kernel** to **−45° diagonal lines**.
+
+Each kernel emphasizes its intended direction by weighting the central axis with a **coefficient of 2**, while maintaining **zero sum** overall to ensure **no response in uniform-intensity regions**.
+
+---
+
+### Response and Selection
+
+Let the outputs of the four directional kernels be denoted as:  
+`Z₁`, `Z₂`, `Z₃`, and `Z₄` — corresponding to the four kernels. These outputs are computed using the spatial convolution defined as:
+
+$$
+Z = \sum_{k=1}^{9} w_k \cdot z_k
+$$
+
+At any point in the image:
+
+-   If `Zₖ > Zⱼ` for all `j ≠ k`, then that point is most likely part of a **line oriented in direction `k`**.
+
+For instance, if at a pixel, `Z₁` is the maximum among all four responses (|Z1| > |Zj| for j = 2,3,4), the point is associated with a **horizontal line**.
+
+---
+
+### Thresholding Directional Responses
+
+To extract lines in a specific orientation (e.g., `+45°`), the following steps are followed:
+
+1. **Convolve the image** with the corresponding directional kernel.
+2. **Threshold** the **positive response**:
+
+    $$
+    g(x, y) =
+    \begin{cases}
+    1, & \text{if } Z(x, y) > T \\
+    0, & \text{otherwise}
+    \end{cases}
+    $$
+
+    where `T` is a positive threshold value selected based on the maximum observed response.
+
+3. The output is a **binary image** in which `1` corresponds to points strongly aligned with the kernel direction.
+
+---
+
+### Example: Detecting Lines at `+45°`
+
+We are interested in identifying **one-pixel-thick lines oriented at `+45°`**
+
+-   **Kernel used**: Second directional kernel 
+-   **(b)** shows the filtered result. The darker and lighter regions indicate negative and positive responses, respectively.
+
+There are two significant segments oriented at `+45°`:
+
+-   **Top-left corner**: Segment is not one pixel thick → yields weaker response.
+-   **Bottom-right corner**: Segment is one pixel thick → yields stronger response .
+
+#### Thresholding the Response
+
+-   From **(e)**, we extract **positive values** of the Laplacian response.
+-   Select threshold `T = 254` (one less than the maximum value).
+-   **(f)** shows the binary output using the rule `g(x, y) > T`, with detected points marked in **white**.
+
+Some **isolated points** also exceed the threshold. These result from local configurations that accidentally align with the kernel's preferred direction.
+
+To address this:
+
+-   Use the **Laplacian kernel** to detect and eliminate such isolated points, or
+-   Apply **morphological operators** for cleanup.
+
+
+
+<br>
+
 ![alt text](/images/image54.png)
+
+---
