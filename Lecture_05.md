@@ -647,13 +647,12 @@ g(x, y) = \begin{aligned}
 $$
 
 $$
-g(x, y) = \left\{
-\begin{array}{ll}
+g(x, y) = \begin{cases}
 1, & \text{if } Z(x, y) > T \\
 0, & \text{otherwise}
-\end{array}
-\right.
+\end{cases}
 $$
+
 
     where `T` is a positive threshold value selected based on the maximum observed response.
 
