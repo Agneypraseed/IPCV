@@ -639,7 +639,14 @@ To extract lines in a specific orientation (e.g., `+45°`), the following steps 
 1. **Convolve the image** with the corresponding directional kernel.
 2. **Threshold** the **positive response**:
 
-    $$g(x, y) = \begin{cases} 1, & \text{if } Z(x, y) > T \\ 0, & \text{otherwise} \end{cases}$$
+    $$
+    g(x, y) = \left\{
+    \begin{array}{ll}
+    1, & \text{if } Z(x, y) > T \\
+    0, & \text{otherwise}
+    \end{array}
+    \right.
+    $$
 
     where `T` is a positive threshold value selected based on the maximum observed response.
 
