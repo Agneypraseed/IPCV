@@ -650,8 +650,7 @@ To extract lines in a specific orientation (e.g., `+45°`), the following steps 
 2. **Threshold** the **positive response**:
 
     $$
-    g(x, y) =
-    \begin{cases}
+    g(x, y) = \begin{cases}
     1, & \text{if } Z(x, y) > T \\
     0, & \text{otherwise}
     \end{cases}
