@@ -640,10 +640,19 @@ To extract lines in a specific orientation (e.g., `+45°`), the following steps 
 2. **Threshold** the **positive response**:
 
 $$
-g(x, y) = \begin{matrix}
-1 & \text{if } Z(x, y) > T \\
-0 & \text{otherwise}
-\end{matrix}
+g(x, y) = \begin{aligned}
+&1, \quad \text{if } Z(x, y) > T \\
+&0, \quad \text{otherwise}
+\end{aligned}
+$$
+
+$$
+g(x, y) = \left\{
+\begin{array}{ll}
+1, & \text{if } Z(x, y) > T \\
+0, & \text{otherwise}
+\end{array}
+\right.
 $$
 
     where `T` is a positive threshold value selected based on the maximum observed response.
