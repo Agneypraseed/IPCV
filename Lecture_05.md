@@ -849,6 +849,129 @@ Given the effects of noise and the sensitivity of derivative operations, edge de
     - Selects from the candidates only those that form **connected edge segments**.
 
 ---
+## Basic Edge Detection
+
+Detecting changes in intensity for the purpose of identifying edges can be accomplished using **first- or second-order derivatives**.
+
+
+### The Image Gradient and Its Properties
+
+The principal tool for determining **edge strength** and **direction** at any point $(x, y)$ in an image $f$ is the **gradient**, denoted by $\nabla f$, and defined as the vector:
+
+$$
+\nabla f(x, y) \equiv 
+\begin{bmatrix}
+g_x(x, y) \\
+g_y(x, y)
+\end{bmatrix}
+=
+\begin{bmatrix}
+\frac{\partial f(x, y)}{\partial x} \\
+\frac{\partial f(x, y)}{\partial y}
+\end{bmatrix}
+$$
+
+- The gradient vector $\nabla f(x, y)$ points in the **direction of the maximum rate of change** of $f$ at $(x, y)$.
+- When computed for **all applicable values** of $x$ and $y$, $\nabla f(x, y)$ becomes a **vector field** (gradient image).
+
+---
+
+### Gradient Magnitude
+
+The **magnitude** $M(x, y)$ of the gradient vector at point $(x, y)$ is given by the **Euclidean norm**:
+
+$$
+M(x, y) = |\nabla f(x, y)| = \sqrt{g_x^2(x, y) + g_y^2(x, y)} 
+$$
+
+- $M(x, y)$, $g_x(x, y)$, and $g_y(x, y)$ are arrays of the same size as the image $f(x, y)$.
+- Elementwise operations are used throughout (see Section 2.6).
+
+---
+
+### Gradient Direction
+
+The **direction** $\alpha(x, y)$ of the gradient vector is:
+
+$$
+\alpha(x, y) = \tan^{-1} \left( \frac{g_y(x, y)}{g_x(x, y)} \right)
+$$
+
+- Angles are measured **counterclockwise from the x-axis** 
+- The **edge direction** is **orthogonal** to the gradient direction at the point.
+
+---
+
+## Computing the Gradient: An Example
+
+**(a)** illustrates a zoomed section of an image with a **straight edge segment**:
+
+- Each square represents a **pixel**.
+- **White pixels**: intensity value = 1  
+- **Shaded pixels**: intensity value = 0
+- The **highlighted box** marks the point of interest.
+
+To compute gradient components:
+
+1. Use a $3 \times 3$ neighborhood centered on the point.
+2. **Approximate partial derivatives**:
+   - In the $x$-direction: subtract **top row** values from **bottom row** values.
+   - In the $y$-direction: subtract **left column** values from **right column** values.
+
+From this:
+
+- $\frac{\partial f}{\partial x} = -2$
+- $\frac{\partial f}{\partial y} = 2$
+
+Then,
+
+$$
+\nabla f = 
+\begin{bmatrix}
+g_x \\
+g_y
+\end{bmatrix}
+=
+\begin{bmatrix}
+-2 \\
+2
+\end{bmatrix}
+\quad \Rightarrow \quad
+|\nabla f| = \sqrt{(-2)^2 + 2^2} = \sqrt{8}
+$$
+
+### Gradient Direction:
+
+$$
+\alpha = \tan^{-1}\left( \frac{2}{-2} \right) = \tan^{-1}(-1) = -45^\circ
+$$
+
+In **positive counterclockwise direction**, this corresponds to:
+
+$$
+\alpha = 135^\circ
+$$
+
+---
+
+### Edge Direction
+
+Since the **edge direction** is **orthogonal** to the gradient vector:
+
+$$
+\theta_{\text{edge}} = \alpha - 90^\circ = 135^\circ - 90^\circ = 45^\circ
+$$
+
+- All edge points in **(a)** share the same gradient.
+- The edge segment is therefore aligned in a **uniform direction**.
+
+---
+
+### Terminology
+
+- The **gradient vector** is also known as the **edge normal**.
+- When normalized to unit length, it is referred to as the **edge unit normal**.
+
 
 
 
