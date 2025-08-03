@@ -821,15 +821,14 @@ The **rightmost column** shows the corresponding second derivatives:
 -   As noise increases:
     -   The second derivative becomes even **more sensitive** to noise than the first.
     -   Only the case with $\sigma = 0.1$ slightly resembles the noiseless profile.
-    - Because the second derivative involves differences of differences, it amplifies even tiny changes in intensity.
+    -   Because the second derivative involves differences of differences, it amplifies even tiny changes in intensity.
     -   The remaining second-derivative images are **heavily distorted**, making it difficult to detect the **positive and negative lobes**, which are essential for locating edges via **zero crossings**.
 
 These results demonstrate that even **low levels of visual noise** can severely impact the performance of **derivative-based edge detectors**.
 
 #### Implication | The Solution:
 
-  >Image **smoothing** must be **seriously considered** before applying derivative operations in edge detection, especially in noisy environments.
-    
+> Image **smoothing** must be **seriously considered** before applying derivative operations in edge detection, especially in noisy environments.
 
 ---
 
@@ -849,17 +848,16 @@ Given the effects of noise and the sensitivity of derivative operations, edge de
     - Selects from the candidates only those that form **connected edge segments**.
 
 ---
+
 ## Basic Edge Detection
 
 Detecting changes in intensity for the purpose of identifying edges can be accomplished using **first- or second-order derivatives**.
-
 
 ### The Image Gradient and Its Properties
 
 The principal tool for determining **edge strength** and **direction** at any point $(x, y)$ in an image $f$ is the **gradient**, denoted by $\nabla f$, and defined as the vector:
 
-$$
-\nabla f(x, y) \equiv 
+$$\nabla f(x, y) \equiv
 \begin{bmatrix}
 g_x(x, y) \\
 g_y(x, y)
@@ -871,8 +869,8 @@ g_y(x, y)
 \end{bmatrix}
 $$
 
-- The gradient vector $\nabla f(x, y)$ points in the **direction of the maximum rate of change** of $f$ at $(x, y)$.
-- When computed for **all applicable values** of $x$ and $y$, $\nabla f(x, y)$ becomes a **vector field** (gradient image).
+-   The gradient vector $\nabla f(x, y)$ points in the **direction of the maximum rate of change** of $f$ at $(x, y)$.
+-   When computed for **all applicable values** of $x$ and $y$, $\nabla f(x, y)$ becomes a **vector field** (gradient image).
 
 ---
 
@@ -881,11 +879,11 @@ $$
 The **magnitude** $M(x, y)$ of the gradient vector at point $(x, y)$ is given by the **Euclidean norm**:
 
 $$
-M(x, y) = |\nabla f(x, y)| = \sqrt{g_x^2(x, y) + g_y^2(x, y)} 
+M(x, y) = |\nabla f(x, y)| = \sqrt{g_x^2(x, y) + g_y^2(x, y)}
 $$
 
-- $M(x, y)$, $g_x(x, y)$, and $g_y(x, y)$ are arrays of the same size as the image $f(x, y)$.
-- Elementwise operations are used throughout (see Section 2.6).
+-   $M(x, y)$, $g_x(x, y)$, and $g_y(x, y)$ are arrays of the same size as the image $f(x, y)$.
+-   Elementwise operations are used throughout (see Section 2.6).
 
 ---
 
@@ -897,36 +895,37 @@ $$
 \alpha(x, y) = \tan^{-1} \left( \frac{g_y(x, y)}{g_x(x, y)} \right)
 $$
 
-- Angles are measured **counterclockwise from the x-axis** 
-- The **edge direction** is **orthogonal** to the gradient direction at the point.
+-   Angles are measured **counterclockwise from the x-axis**
+-   The **edge direction** is **orthogonal** to the gradient direction at the point.
 
 ---
 
 ## Computing the Gradient: An Example
 
+![alt text](/images/image61.png)
+
 **(a)** illustrates a zoomed section of an image with a **straight edge segment**:
 
-- Each square represents a **pixel**.
-- **White pixels**: intensity value = 1  
-- **Shaded pixels**: intensity value = 0
-- The **highlighted box** marks the point of interest.
+-   Each square represents a **pixel**.
+-   **White pixels**: intensity value = 1
+-   **Shaded pixels**: intensity value = 0
+-   The **highlighted box** marks the point of interest.
 
 To compute gradient components:
 
 1. Use a $3 \times 3$ neighborhood centered on the point.
 2. **Approximate partial derivatives**:
-   - In the $x$-direction: subtract **top row** values from **bottom row** values.
-   - In the $y$-direction: subtract **left column** values from **right column** values.
+    - In the $x$-direction: subtract **top row** values from **bottom row** values.
+    - In the $y$-direction: subtract **left column** values from **right column** values.
 
 From this:
 
-- $\frac{\partial f}{\partial x} = -2$
-- $\frac{\partial f}{\partial y} = 2$
+-   $\frac{\partial f}{\partial x} = -2$
+-   $\frac{\partial f}{\partial y} = 2$
 
 Then,
 
-$$
-\nabla f = 
+$$\nabla f =
 \begin{bmatrix}
 g_x \\
 g_y
@@ -962,18 +961,15 @@ $$
 \theta_{\text{edge}} = \alpha - 90^\circ = 135^\circ - 90^\circ = 45^\circ
 $$
 
-- All edge points in **(a)** share the same gradient.
-- The edge segment is therefore aligned in a **uniform direction**.
+-   All edge points in **(a)** share the same gradient.
+-   The edge segment is therefore aligned in a **uniform direction**.
 
 ---
 
 ### Terminology
 
-- The **gradient vector** is also known as the **edge normal**.
-- When normalized to unit length, it is referred to as the **edge unit normal**.
-
-
-
+-   The **gradient vector** is also known as the **edge normal**.
+-   When normalized to unit length, it is referred to as the **edge unit normal**.
 
 <br>
 
