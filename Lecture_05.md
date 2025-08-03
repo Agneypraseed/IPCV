@@ -111,55 +111,49 @@ These subregions must satisfy the following conditions:
 1.  **Completeness**  
      Every pixel in the image must belong to a region:
 
-        ` R = R₁ ∪ R₂ ∪ ... ∪ Rₙ
+         R = R₁ ∪ R₂ ∪ ... ∪ Rₙ
 
-    `
-
-        This ensures that the segmentation fully covers the spatial domain.
+      This ensures that the segmentation fully covers the spatial domain.
 
 2.  **Connectivity**  
      Each region `Rᵢ` must be a connected set:
 
-        ` Rᵢ is connected, for all i ∈ {1, 2, ..., n}
+        Rᵢ is connected, for all i ∈ {1, 2, ..., n}
 
-    `
+      Connectivity means that every pixel in a region `R_i` is reachable from any other pixel in `R_i` **by a path that stays entirely within the region**.
 
-        Connectivity means that every pixel in a region `R_i` is reachable from any other pixel in `R_i` **by a path that stays entirely within the region**.
+      A set of pixels is **connected** if there exists a path (within the region) between any two pixels in that set. This path must obey a selected **connectivity rule**, commonly one of the following:
 
-        A set of pixels is **connected** if there exists a path (within the region) between any two pixels in that set. This path must obey a selected **connectivity rule**, commonly one of the following:
+      - **4-connectivity**: A pixel is connected to its immediate horizontal and vertical neighbors only.
+      - **8-connectivity**: A pixel is connected to all 8 of its immediate neighbors (including diagonal neighbors).
 
-        - **4-connectivity**: A pixel is connected to its immediate horizontal and vertical neighbors only.
-        - **8-connectivity**: A pixel is connected to all 8 of its immediate neighbors (including diagonal neighbors).
+      The type of connectivity must be predefined.
 
-        The type of connectivity must be predefined.
-
-        Without enforcing connectedness, a region might consist of scattered, unrelated pixels — which is typically **not meaningful** for segmentation or analysis.
+      Without enforcing connectedness, a region might consist of scattered, unrelated pixels — which is typically **not meaningful** for segmentation or analysis.
 
 3.  **Disjointness**  
      The regions must be mutually exclusive:
 
-        ` Rᵢ ∩ Rⱼ = ∅, for all i ≠ j
-
-    `
+         Rᵢ ∩ Rⱼ = ∅, for all i ≠ j
 
 4.  **Homogeneity**  
      A logical predicate `Q(Rᵢ)` must be satisfied by all pixels in region `Rᵢ`:
 
-        ` Q(Rᵢ) = TRUE, for all i ∈ {1, 2, ..., n}
+         Q(Rᵢ) = TRUE, for all i ∈ {1, 2, ..., n}
 
-    `
+    
 
-        This predicate defines a property such as intensity uniformity, texture similarity, etc.
-        Each region must satisfy a given property (defined by the predicate Q).
+      This predicate defines a property such as intensity uniformity, texture similarity, etc.
+      Each region must satisfy a given property (defined by the predicate Q).
 
 5.  **Maximality**  
      For any pair of adjacent regions `Rᵢ` and `Rⱼ`, the predicate `Q` must fail when applied to their union:
 
-        ` Q(Rᵢ ∪ Rⱼ) = FALSE, if Rᵢ and Rⱼ are adjacent
+         Q(Rᵢ ∪ Rⱼ) = FALSE, if Rᵢ and Rⱼ are adjacent
 
-    `
+    
 
-        Two regions are adjacent if their union forms a connected set.
+      Two regions are adjacent if their union forms a connected set.
 
 ---
 
@@ -649,14 +643,11 @@ To extract lines in a specific orientation (e.g., `+45°`), the following steps 
 1. **Convolve the image** with the corresponding directional kernel.
 2. **Threshold** the **positive response**:
 
-    $$
-    g(x, y) =
+    $${g(x, y) =
     \begin{cases}
     1, & \text{if } Z(x, y) > T \\
     0, & \text{otherwise}
-    \end{cases}
-    $$
-
+    \end{cases}}$$
 
     where `T` is a positive threshold value selected based on the maximum observed response.
 
@@ -668,7 +659,7 @@ To extract lines in a specific orientation (e.g., `+45°`), the following steps 
 
 We are interested in identifying **one-pixel-thick lines oriented at `+45°`**
 
--   **Kernel used**: Second directional kernel 
+-   **Kernel used**: Second directional kernel
 -   **(b)** shows the filtered result. The darker and lighter regions indicate negative and positive responses, respectively.
 
 There are two significant segments oriented at `+45°`:
@@ -688,8 +679,6 @@ To address this:
 
 -   Use the **Laplacian kernel** to detect and eliminate such isolated points, or
 -   Apply **morphological operators** for cleanup.
-
-
 
 <br>
 
