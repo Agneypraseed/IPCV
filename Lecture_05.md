@@ -639,14 +639,14 @@ To extract lines in a specific orientation (e.g., `+45°`), the following steps 
 1. **Convolve the image** with the corresponding directional kernel.
 2. **Threshold** the **positive response**:
 
-  $$
-  g(x, y) = \begin{cases}
-  1, & \text{if } Z(x, y) > T \\
-  0, & \text{otherwise}
-  \end{cases}
-  $$
+$$
+g(x, y) = \begin{cases}
+1, & \text{if } Z(x, y) > T \\
+0, & \text{otherwise}
+\end{cases}
+$$
 
-    where `T` is a positive threshold value selected based on the maximum observed response.
+where `T` is a positive threshold value selected based on the maximum observed response.
 
 3. The output is a **binary image** in which `1` corresponds to points strongly aligned with the kernel direction.
 
@@ -676,6 +676,181 @@ To address this:
 
 -   Use the **Laplacian kernel** to detect and eliminate such isolated points, or
 -   Apply **morphological operators** for cleanup.
+
+---
+
+### Edge Models
+
+An edge model describes the shape of intensity change across an edge. It's a 1D profile — like scanning across an edge and plotting how the pixel intensity changes.
+**Edge detection** is a fundamental technique in image segmentation, focused on identifying **abrupt (local) intensity changes**.
+
+---
+
+### Classification of Edge Models by Intensity Profile
+
+Edge models are typically classified by their **intensity transition profiles**:
+
+![alt text](/images/image58.png)
+
+#### 1. Step Edge
+
+A **step edge** represents an ideal transition between two intensity levels, ideally over **one pixel**.
+
+-   **(a)** shows a section of a vertical step edge and the corresponding horizontal intensity profile.
+-   These occur in synthetic images, such as those from solid modeling or animation.
+-   If no smoothing is applied, the edge remains one-pixel wide.
+-   **Step-edge models** are frequently used for algorithm development (e.g., the **Canny edge detector** was derived using this model).
+
+#### 2. Ramp Edge
+
+In real-world images, due to **focus limitations** (e.g., lens aberrations) and **sensor noise**, edges are usually **blurred**.  
+These are more accurately modeled as **ramp edges**, as shown in **(b)**:
+
+-   The **slope** of the ramp is **inversely proportional** to the degree of blurring.
+-   There is no single edge point. Instead, any point on the ramp is considered part of the edge.
+-   An **edge segment** consists of connected ramp points.
+
+#### 3. Roof Edge
+
+A **roof edge** models thin line-like features.**(c)**:
+
+-   The **base width** depends on the thickness and sharpness of the line.
+-   In the limit of a one-pixel-wide base, the roof edge becomes a **one-pixel-thick line**.
+-   Examples:
+    -   **Range imaging** (e.g., pipes closer to the sensor than the wall).
+    -   **Digitized line drawings**.
+    -   **Satellite imagery** (e.g., roads modeled as roof edges).
+
+It is common to find all three types of edges in a single image. Although **noise and blur** alter the profiles, reasonably sharp edges retain a resemblance to these idealized models.
+
+---
+
+### Practical Use of Edge Models
+
+The benefit of these models is that they enable the formulation of **mathematical representations** of edges, which are essential for algorithm development. The **performance of an edge detector** depends on how closely real image content matches the model used in its derivation.
+
+---
+
+### Behavior of Derivatives
+
+![alt text](/images/image59.png)
+
+From left to right along the ramp:
+
+-   The **first derivative**:
+
+    -   Is **positive** at the onset of the ramp and on the ramp itself.
+    -   Is **zero** in constant-intensity regions.
+
+-   The **second derivative**:
+    -   Is **positive** at the beginning of the ramp.
+    -   Is **negative** at the end of the ramp.
+    -   Is **zero** on the ramp and in constant regions.
+
+If the edge transitions from **light to dark**, the **signs are reversed**.
+
+The **zero crossing** of the second derivative is defined by the intersection of the **intensity axis** and a line between the extrema of the second derivative. This point is used to **localize the center** of thick edges.
+
+---
+
+### Key Observations
+
+1. The **magnitude of the first derivative** can be used to **detect** the presence of an edge.
+2. The **sign of the second derivative** helps identify which side of the edge (light or dark) a pixel lies on.
+3. The second derivative:
+    - Produces **two values per edge** (at the start and end of the ramp).
+    - Its **zero crossings** provide accurate **localization** of the edge center.
+
+---
+
+### Generalization to 2D Images
+
+We've been looking at how intensity changes along a single row of pixels (like left to right). But real images are 2D — intensity can also change vertically, diagonally, etc.
+Although the analysis above applies to a **1D horizontal profile**, it generalizes naturally:
+
+-   At any point on an edge, define a **1D profile perpendicular** to the edge orientation.
+-   Apply the same interpretation of the **first** and **second derivatives**.
+
+---
+
+Some models include **smooth transitions into and out of the ramp**, but the conclusions remain largely consistent with the ideal ramp. Real-world edges aren’t perfect. They often fade in and out gradually (i.e., not ideal ramps), but the same derivative behavior still appears. Using the simplified ramp model facilitates theoretical development without significant loss of generality.
+
+---
+
+### Behavior of the First and Second Derivatives in the Region of a Noisy Edge
+
+The edge models shown in above are idealized and **free of noise**. However, real images often include noise, which affects edge detection significantly. To analyze this, below presents image segments showing four **ramp edges** transitioning from **black (left)** to **white (right)**—representing a **single edge** transition.
+
+## ![alt text](/images/image60.png)
+
+### Noise Levels in Edge Images
+
+-   The **top-left image** is free of noise.
+-   The **remaining three images** (first column) are corrupted with **additive Gaussian noise** of:
+    -   Mean = 0
+    -   Standard deviations: $\sigma = 0.1$, $1.0$, and $10.0$ intensity levels
+-   All images have **8-bit resolution**:
+    -   Intensity range: $0$ (black) to $255$ (white)
+-   Below each image is a **horizontal intensity profile** through the image center.
+
+---
+
+### Behavior of the First Derivative
+
+Consider the **top of the center column**, which shows the first derivative of the **noiseless edge**:
+
+-   In **constant regions**, the derivative is **zero** (appearing as black bands).
+-   On the **ramp**, the derivative is **constant and non-zero**, equal to the slope of the ramp (shown in gray).
+-   As we move **down the column**, the derivatives deviate significantly due to noise:
+    -   With increasing noise, it becomes harder to associate the resulting profile with that of a ramp.
+    -   **Notably**, even when noise is **visually undetectable** in the original images, it **strongly disrupts** the derivatives.
+
+This highlights the **sensitivity of the first derivative to noise**.
+
+---
+
+### Behavior of the Second Derivative
+
+The **rightmost column** shows the corresponding second derivatives:
+
+-   In the **noiseless image**:
+
+    -   Thin **white and black vertical lines** represent the **positive and negative** components of the second derivative, respectively.
+    -   **Gray** represents **zero response**
+
+-   As noise increases:
+    -   The second derivative becomes even **more sensitive** to noise than the first.
+    -   Only the case with $\sigma = 0.1$ slightly resembles the noiseless profile.
+    - Because the second derivative involves differences of differences, it amplifies even tiny changes in intensity.
+    -   The remaining second-derivative images are **heavily distorted**, making it difficult to detect the **positive and negative lobes**, which are essential for locating edges via **zero crossings**.
+
+These results demonstrate that even **low levels of visual noise** can severely impact the performance of **derivative-based edge detectors**.
+
+#### Implication | The Solution:
+
+  >Image **smoothing** must be **seriously considered** before applying derivative operations in edge detection, especially in noisy environments.
+    
+
+---
+
+### Typical Steps in Edge Detection
+
+Given the effects of noise and the sensitivity of derivative operations, edge detection typically involves **three sequential steps**:
+
+1. **Image Smoothing (Noise Reduction):**
+
+    - Necessary to reduce the impact of noise.
+
+2. **Edge Point Detection:**
+
+    - A **local operation** that identifies all pixels that are potential **edge-point candidates**.
+
+3. **Edge Localization:**
+    - Selects from the candidates only those that form **connected edge segments**.
+
+---
+
+
 
 <br>
 
