@@ -1093,7 +1093,7 @@ While the Sobel kernel treats **north and south** edges identically (both as ver
 
 ## Illustration of the 2-D Gradient Magnitude and Angle
 
-![alt text](/images/image68.png)
+![alt text](/images/image68.png) Fig. 10.16
 
 Fig illustrates the **Sobel absolute value response** of the two components of the gradient, `g_x` and `g_y`, as well as the **gradient image** formed from their sum. The directionality of the **horizontal** and **vertical** components of the gradient is clearly observed
 
@@ -1125,9 +1125,10 @@ The original image used in the example above contains **high-resolution fine det
 -   **Derivative operations** amplify such high-frequency content.
 -   This makes it more difficult to isolate principal edges.
 
-To mitigate this issue, the image is **smoothed** before gradient computation. 
+To mitigate this issue, the image is **smoothed** before gradient computation.
 
-![alt text](/images/image70.png)
+![alt text](/images/image70.png) Fig. 10.18
+
 **Figure** presents the same sequence of images, but the original input is first processed using a `5 × 5` **averaging filter**. As a result:
 
 -   The influence of **brick patterns** is significantly reduced.
@@ -1152,3 +1153,40 @@ These figures illustrate:
 Although both Kirsch kernels respond somewhat to non-diagonal edges, their **stronger directional selectivity** makes them particularly suited for highlighting **diagonal features** that Sobel kernels may miss.
 
 ---
+
+### Combining the Gradient with Thresholding
+
+---
+
+Edge detection can be made more selective by smoothing the image prior to computing the gradient. Another approach aimed at achieving the same objective is to **threshold the gradient image**.
+
+![alt text](/images/image72.png)
+
+For example, (a) shows the gradient image from Fig. 10.16(d), thresholded so that pixels with values greater than or equal to `33%` of the maximum value of the gradient image are shown in white, while pixels below the threshold value are shown in black.
+
+Comparing this image with the Sobel absolute value response (Fig. 10.16(d)), we see that:
+
+-   There are fewer edges in the thresholded image.
+-   The edges in this image are much sharper (see, for example, the edges in the roof tile).
+-   On the other hand, numerous edges — such as the sloping line defining the far edge of the roof (see arrow) — are **broken** in the thresholded image.
+
+When interest lies both in **highlighting the principal edges** and in **maintaining as much connectivity as possible**, it is common practice to use both **smoothing and thresholding**.
+
+Figure (b) shows the result of thresholding Fig. 10.18(d), which is the gradient of the **smoothed image**. This result shows a reduced number of broken edges. For instance, compare the corresponding edges identified by the arrows in (a) and (b).
+
+---
+
+Summary
+----------
+
+Gradient computation gives us the edge strength at every pixel — but includes everything, including noise and minor details.
+
+Smoothing (blurring) reduces noise before computing the gradient:
+
+-   This prevents small variations (like brick textures) from being falsely detected as edges.
+
+Thresholding removes weak edges:
+
+-   Only keeps edges where the gradient magnitude is strong enough (above a certain threshold).
+
+-   This helps highlight major edges and eliminate clutter.
