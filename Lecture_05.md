@@ -42,6 +42,9 @@ This means that the noise at each pixel is independently drawn from a normal dis
 #### Other Common Noise Models
 
 -   **Salt-and-Pepper Noise**: Impulsive in nature; randomly assigns some pixels to minimum or maximum intensity (0 or 255).
+    - Salt-and-Pepper Noise is *not* an additive noise.
+    - It doesn’t modify the pixel’s value by adding something. Instead, it replaces random pixels with either the minimum (0) or maximum (255) value
+    - ![alt text](/images/image75.png)
 -   **Speckle Noise**: Multiplicative and structured; often follows Rayleigh or Gamma distributions; common in radar and ultrasound images.
 -   **Poisson Noise**: Signal-dependent noise; arises in photon-limited imaging such as low-light photography or microscopy.
 
