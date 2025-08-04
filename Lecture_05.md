@@ -857,7 +857,8 @@ Detecting changes in intensity for the purpose of identifying edges can be accom
 
 The principal tool for determining **edge strength** and **direction** at any point $(x, y)$ in an image $f$ is the **gradient**, denoted by $\nabla f$, and defined as the vector:
 
-$$\nabla f(x, y) \equiv
+$$
+\nabla f(x, y) \equiv
 \begin{bmatrix}
 g_x(x, y) \\
 g_y(x, y)
@@ -925,7 +926,8 @@ From this:
 
 Then,
 
-$$\nabla f =
+$$
+\nabla f =
 \begin{bmatrix}
 g_x \\
 g_y
@@ -971,8 +973,121 @@ $$
 -   The **gradient vector** is also known as the **edge normal**.
 -   When normalized to unit length, it is referred to as the **edge unit normal**.
 
-<br>
+---
+
+## Gradient Operators
+
+Obtaining the gradient of an image requires computing the partial derivatives $∂f/∂x$ and $∂f/∂y$ at every pixel location in the image. For the gradient, we typically use either **forward** or **centered finite differences**. Using forward differences, we obtain:
+
+-   $g_x(x, y) = f(x + 1, y) - f(x, y)$
+-   $g_y(x, y) = f(x, y + 1) - f(x, y)$
+
+These equations are implemented over the entire image $f(x, y)$ by **filtering** with the 1-D kernels : ![alt text](/images/image62.png).
+
+---
+
+### Roberts Cross Operators
+
+![alt text](/images/image63.png)
+
+When diagonal edge directions are of interest, **2-D kernels** are used. The **Roberts cross-gradient operators** (Roberts [1965]) represent an early approach to this. Consider the `$3 × 3$` region in **(a)**. The Roberts operators are defined by:
+
+-   $g_x = z_9 - z_5$
+-   $g_y = z_8 - z_6$
+
+These differences are implemented via filtering with the corresponding kernels shown above
+
+Although `$2 × 2$` kernels are simple, they are less effective at capturing edge **directional information**. This limitation arises from their lack of symmetry about the center pixel.
+
+```
+In digital image processing, we often use a different coordinate system:
+
+The origin (0,0) is at the top-left corner,
+
+The x-axis increases rightward,
+
+The y-axis increases downward.
+```
+
+\[
+G_x = f(x, y) - f(x+1, y+1)
+\]
+
+This measures the difference between the top-left and bottom-right, the Roberts $G_x$ detects edges along +45°, corresponding to the ↘ direction.
+
+---
+
+### Prewitt Operators
+
+The smallest **symmetric kernels** suitable for directional edge detection are of size `3 × 3`. These consider data on both sides of the center point and thus encode more directional information. The **Prewitt operator** approximations for partial derivatives are:
+
+-   $g_x = (z_7 + z_8 + z_9) - (z_1 + z_2 + z_3)$
+-   $g_y = (z_3 + z_6 + z_9) - (z_1 + z_4 + z_7)$
+
+Here, the difference between the **third and first rows** approximates `∂f/∂x`, and the difference between the **third and first columns** approximates `∂f/∂y`. These kernels are implemented using :
+
+![alt text](/images/image64.png)
+
+---
+
+### Sobel Operators
+
+A refinement of the Prewitt operator uses a **weight of 2** in the center row/column for added smoothing:
+
+-   $g_x = (z_7 + 2z_8 + z_9) - (z_1 + 2z_2 + z_3)$
+-   $g_y = (z_3 + 2z_6 + z_9) - (z_1 + 2z_4 + z_7)$
+
+These are implemented using the kernels
+![alt text](/images/image65.png)
+
+The use of a center weight of 2 offers improved **noise suppression**, which is critical when computing derivatives. 
+
+---
+
+### Gradient Computation and Magnitude Approximation
+
+To compute gradient vectors:
+
+1. **Convolve** the image with the appropriate pair of kernels to obtain `g_x` and `g_y`.
+2. Use these to compute edge **magnitude** and **direction**.
+
+The gradient **magnitude** is typically computed using:
+
+-   $M(x, y) = \sqrt{g_x^2(x, y) + g_y^2(x, y)}$
+
+However, this computation involves squaring and square roots, which may be computationally expensive. An alternative approximation is:
+
+-   $M(x, y) ≈ |g_x(x, y)| + |g_y(x, y)|$
+
+This approximation is faster and still preserves **relative intensity variations**, though it introduces **anisotropy**—i.e., the filters become **non-rotation-invariant**. Nonetheless, when using **Prewitt** or **Sobel** kernels, which already produce **isotropic responses only for vertical and horizontal edges**, this loss of isotropy is not significant. Both these equations **identical results** for vertical and horizontal edges with these kernels (see Problem 10.11).
+
+---
+
+### Kirsch Compass Operators
+
+Prewitt and Sobel are isotropic only for vertical and horizontal edges.
+
+So the approximate formula works well in those directions.
+
+For general orientation detection (e.g., diagonal edges), isotropy is lost.
+
+To handle **all eight compass directions**, **Kirsch compass kernels** (Kirsch [1971]) are used. 
+
+![alt text](/images/image66.png)
+
+-   Each kernel targets a specific **compass direction** (N, NE, E, etc.).
+-   The gradient **magnitude** at each pixel is taken as the **maximum response** from all eight kernels.
+-   The **gradient direction** is assigned based on the direction of the kernel yielding this maximum.
+
+For instance, if the **North (N)** kernel produces the strongest response at a pixel, the edge direction is assigned as $0^\circ$. Since kernel pairs differ by $180^\circ$, selecting the **maximum positive** value ensures consistent directionality.
+
+While the Sobel kernel treats **north and south** edges identically (both as vertical), the Kirsch method distinguishes them based on **intensity transition** direction. For example, an edge transitioning from black (0) on the left to white (1) on the right, would yield a stronger response from the **N kernel**, indicating a **northward** edge.
+
+---
+
+![alt text](/images/image67.png)
 
 ![alt text](/images/image54.png)
 
 ---
+
