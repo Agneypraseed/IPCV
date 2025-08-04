@@ -1040,7 +1040,7 @@ A refinement of the Prewitt operator uses a **weight of 2** in the center row/co
 These are implemented using the kernels
 ![alt text](/images/image65.png)
 
-The use of a center weight of 2 offers improved **noise suppression**, which is critical when computing derivatives. 
+The use of a center weight of 2 offers improved **noise suppression**, which is critical when computing derivatives.
 
 ---
 
@@ -1071,7 +1071,7 @@ So the approximate formula works well in those directions.
 
 For general orientation detection (e.g., diagonal edges), isotropy is lost.
 
-To handle **all eight compass directions**, **Kirsch compass kernels** (Kirsch [1971]) are used. 
+To handle **all eight compass directions**, **Kirsch compass kernels** (Kirsch [1971]) are used.
 
 ![alt text](/images/image66.png)
 
@@ -1091,3 +1091,64 @@ While the Sobel kernel treats **north and south** edges identically (both as ver
 
 ---
 
+## Illustration of the 2-D Gradient Magnitude and Angle
+
+![alt text](/images/image68.png)
+
+Fig illustrates the **Sobel absolute value response** of the two components of the gradient, `g_x` and `g_y`, as well as the **gradient image** formed from their sum. The directionality of the **horizontal** and **vertical** components of the gradient is clearly observed
+
+For example:
+
+-   In **(b)**, the **roof tiles**, **horizontal brick joints**, and **horizontal window segments** exhibit strong responses due to the horizontal component `g_x`.
+-   In **(c)**, the **vertical façade structures** and **window divisions** are more prominent due to the vertical component $g_y$.
+
+It is common to use the term **edge map** when referring to images that highlight edge features, such as **gradient magnitude images**. In these examples, the intensity values of the image were scaled to the range `[0, 1]` for consistency and to simplify parameter selection in edge detection algorithms.
+
+---
+
+### Gradient Angle Image
+
+**Figure** displays the **gradient angle image** computed using Equation
+
+-   $θ(x, y) = \tan^{-1}\left(\dfrac{g_y(x, y)}{g_x(x, y)}\right)$
+
+![alt text](/images/image69.png)
+
+Although **angle images** are generally not as effective for direct edge detection as **magnitude images**, they provide **complementary information**. For instance, regions with **constant intensity**—such as the **sloping roof edge** and **top horizontal bands**—show uniform gradient direction, as indicated by the constant pixel values in the angle image.
+
+---
+
+### Impact of Fine Detail and Smoothing
+
+The original image used in the example above contains **high-resolution fine detail**, particularly from wall bricks. While this enhances texture, it introduces **undesirable noise** in edge detection tasks because:
+
+-   **Derivative operations** amplify such high-frequency content.
+-   This makes it more difficult to isolate principal edges.
+
+To mitigate this issue, the image is **smoothed** before gradient computation. 
+
+![alt text](/images/image70.png)
+**Figure** presents the same sequence of images, but the original input is first processed using a `5 × 5` **averaging filter**. As a result:
+
+-   The influence of **brick patterns** is significantly reduced.
+-   **Principal edges** (e.g., structural outlines) become more dominant in the gradient responses.
+
+---
+
+### Limitations of Sobel Kernels and Diagonal Edge Detection
+
+The **Sobel kernels** do **not respond strongly** to edges oriented at `±45°`. If diagonal edge detection is important, **Kirsch compass kernels** should be used.
+
+![alt text](/images/image71.png)
+
+-   **(a)** shows the response of the $+45°$ Kirsch kernel (NW direction).
+-   **(b)** shows the response of the $-45°$ Kirsch kernel (SW direction).
+
+These figures illustrate:
+
+-   **Stronger sensitivity** to edges oriented along the specified diagonals.
+-   **Weaker response** to horizontal and vertical features, as expected.
+
+Although both Kirsch kernels respond somewhat to non-diagonal edges, their **stronger directional selectivity** makes them particularly suited for highlighting **diagonal features** that Sobel kernels may miss.
+
+---
