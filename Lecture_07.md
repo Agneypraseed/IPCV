@@ -12,6 +12,14 @@ It is defined as the sum of the second-order partial derivatives in the horizont
 
 $\nabla^2 f(x,y) = \frac{\partial^2 f}{\partial x^2} + \frac{\partial^2 f}{\partial y^2}$
 
+The operator is not biased toward any direction — it gives equal weight to changes in x and y. That’s why it’s symmetric
+
+A gradient points in a direction.
+
+The Laplacian is scalar: it gives you a single value that says whether the intensity is peaking, dipping, or flat — but not which way. It doesn’t tell you the direction of change — only that there is a curvature
+
+> -   The Laplacian operator is symmetric and non-directional.
+
 ---
 
 ### Discrete Approximations of Second Derivatives
@@ -62,6 +70,8 @@ Zero-crossings of the second-order derivatives correspond to the precise locatio
 -   The second derivative is even more sensitive since it represents differences of differences.
 
 ---
+
+# Using zero crossings for edge detection
 
 ## The Marr-Hildreth Edge Detector: Principle and Implementation
 
@@ -143,7 +153,7 @@ This subplot shows a 1D slice through the center of the 3D LoG surface.
 
 ## (d) 5×5 Discrete LoG Kernel Approximation
 
-This kernel is a sampled and quantized approximation of the continuous LoG function, used for convolution in digital image processing. 
+This kernel is a sampled and quantized approximation of the continuous LoG function, used for convolution in digital image processing.
 
 The negative of this kernel would be used in practice. This is specifically for image sharpening
 
@@ -159,9 +169,9 @@ The negative of this kernel would be used in practice. This is specifically for 
 
 **Properties:**
 
-- **Central Positive Value (16)**: Represents the peak of the LoG.
-- **Surrounding Negative Values**: Capture the negative trough.
-- **Zero Sum**: The kernel coefficients should sum to zero to suppress constant regions:
+-   **Central Positive Value (16)**: Represents the peak of the LoG.
+-   **Surrounding Negative Values**: Capture the negative trough.
+-   **Zero Sum**: The kernel coefficients should sum to zero to suppress constant regions:
 
 ### Sharpening Formula
 
@@ -258,5 +268,108 @@ To avoid false detections due to minor variations or noise:
 -   Only mark a pixel as an edge if this difference exceeds the threshold.
 
 This step helps suppress insignificant or noisy zero-crossings.
+
+---
+
+### Zero-Crossing Detection Procedure
+
+For each pixel $p$ in the LoG-filtered image, we apply a **two-part test** using a $3 \times 3$ neighborhood centered on $p$:
+
+### 1. **Sign Change Condition**
+
+We test for the presence of a **zero-crossing** based on the sign of $\nabla^2 G(x, y)$ (the Laplacian of Gaussian).
+
+**Procedure:**
+
+-   Consider the **four pairs** of opposite neighbors around $p$ in the $3 \times 3$ mask:
+    -   **Horizontal**: Left and right
+    -   **Vertical**: Top and bottom
+    -   **Diagonal (/)**: Top-right and bottom-left
+    -   **Diagonal (\\)**: Top-left and bottom-right
+
+**Condition:**
+
+-   A **sign change** is detected if, in any of the four pairs:
+    -   One pixel has a **positive** LoG value and the other has a **negative** value.
+
+This indicates that the Laplacian function crosses zero at or near pixel $p$.
+
+---
+
+### 2. **Threshold Condition**
+
+The sign change condition alone is too sensitive and may detect minor fluctuations due to **noise**. To suppress such false positives, we introduce a **threshold test**.
+
+**Procedure:**
+
+-   For any pair where a sign change is found:
+    -   Compute the **absolute difference** between the pixel values:
+        $$
+        |\nabla^2 G(x_1, y_1) - \nabla^2 G(x_2, y_2)|
+        $$
+-   Compare this value to a user-defined **threshold**.
+
+**Condition:**
+
+-   The difference must exceed a **threshold $T$**, i.e.,
+    $$
+    |\text{value}_1 - \text{value}_2| > T
+    $$
+-   Only then is the sign change considered **significant**.
+
+---
+
+### 3. **Final Decision**
+
+A pixel $p$ is marked as a **zero-crossing pixel** (i.e., part of an edge) **if and only if** both of the following conditions are satisfied:
+
+-   There is a **sign change** in at least one of the four opposite pixel pairs.
+-   The **absolute difference** of the pair exceeds the threshold.
+
+This two-part test improves the **robustness** of the Marr-Hildreth detector by ensuring that only **meaningful zero-crossings** (likely corresponding to edges) are preserved.
+
+---
+
+### Example
+
+![alt text](/images/image85.png)
+
+Applying the Marr-Hildreth edge detection method to a grayscale building image.
+
+-   **(a):** Original building image.
+-   **(b):** Result of applying **Steps 1 and 2** of the Marr-Hildreth algorithm.
+-   **(c):** Zero-crossing result with a **zero threshold**.
+-   **(d):** Zero-crossing result with a **positive threshold** (4% of maximum LoG value).
+
+#### Parameters
+
+-   **$s = 4$:** Standard deviation of the Gaussian used for smoothing. This value corresponds to approximately 0.5% of the short dimension of the image.
+-   **$n = 25$:** Size of the LoG mask used to ensure it adequately captures the Gaussian profile (as required by the size condition).
+
+#### (b) Output of Steps 1 and 2
+
+-   The Laplacian of Gaussian (LoG) is applied using the given $s$ and $n$ values.
+-   Gray tones in the image result from **intensity scaling** for visualization.
+-   This output is the **input** for zero-crossing detection.
+
+#### (c) Zero-Crossings with Zero Threshold
+
+-   **Threshold:** 0
+-   **Method:** A $3 \times 3$ neighborhood-based approach is used to identify zero-crossings.
+-   **Result:** Many **closed-loop edges** appear, a phenomenon known as the **"spaghetti effect"**.
+    -   These loops often do **not correspond to real object boundaries**.
+    -   This is a **major limitation** of using a zero threshold.
+
+#### (d) Zero-Crossings with Threshold = 4% of Maximum LoG Value
+
+-   **Threshold:** $0.04 \times \max(\text{LoG})$
+-   **Result:**
+
+    -   Major structural edges are preserved (e.g., outlines of windows, walls).
+    -   **Irrelevant features** (e.g., bricks and tiles) are effectively **filtered out**.
+    -   This improved performance is **difficult to achieve** with gradient-based edge detectors.
+
+-   Another important consequence of using zero crossings for edge detection is that the resulting edges are
+    1 pixel thick - **1-pixel-thick edges** simplify subsequent steps such as **edge linking** and **region segmentation**.
 
 ---
