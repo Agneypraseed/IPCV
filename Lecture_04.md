@@ -706,7 +706,8 @@ In image processing, derivative approximations are implemented using **discrete 
 This estimates the first derivative using the point ahead:
 
 $\frac{f(x + h) - f(x)}{h}$
->h = 1
+
+> h = 1
 
 $f(x+1) - f(x) = (-1) \cdot f(x) + (1) \cdot f(x+1)$
 
@@ -728,7 +729,7 @@ This estimates the derivative using the point behind:
 
 $\frac{f(x) - f(x - h)}{h}$
 
-**Filter mask:** `[1 -1 0]`
+**Filter mask:** `[-1 1 0]`
 
 ### 3. Central Difference Approximation
 
@@ -892,6 +893,7 @@ However, when convolving an image with a kernel whose coefficients sum to zero, 
 > If an image is filtered with a kernel whose coefficients sum to zero. Then the sum of the pixel values in the filtered image also is zero.
 
 ---
+
 ### First Derivatives and the Gradient in Image Processing
 
 In digital image processing, **first-order derivatives** are implemented through the **magnitude of the gradient** of an image.
@@ -902,42 +904,43 @@ $\nabla f = \begin{bmatrix} \frac{\partial f}{\partial x} \\ \frac{\partial f}{\
 
 This is a **2D column vector** that:
 
-- Points in the direction of the **maximum rate of intensity change** in the image.
-- Is perpendicular to level curves (isointensity contours) of the image at point `(x, y)`.
+-   Points in the direction of the **maximum rate of intensity change** in the image.
+-   Is perpendicular to level curves (isointensity contours) of the image at point `(x, y)`.
 
 ### Gradient Magnitude
 
 The **magnitude** (or Euclidean norm) of the gradient vector at point `(x, y)` is given by:
 
-$M(x, y) = |\nabla f| = \sqrt{\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2}$ *(Eq. 3-58)*
+$M(x, y) = |\nabla f| = \sqrt{\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2}$ _(Eq. 3-58)_
 
 This quantity represents:
 
-- The **rate of intensity change** at point `(x, y)` in the direction of the gradient.
-- The **strength of edges** in the image.
+-   The **rate of intensity change** at point `(x, y)` in the direction of the gradient.
+-   The **strength of edges** in the image.
 
 By computing the gradient magnitude `M(x, y)` over all pixel locations, we generate a **gradient image**, which:
 
-- Has the **same dimensions** as the original image `f(x, y)`.
-- Highlights **edges and sharp transitions** in intensity.
-- Is often referred to simply as the **gradient** when context is clear.
+-   Has the **same dimensions** as the original image `f(x, y)`.
+-   Highlights **edges and sharp transitions** in intensity.
+-   Is often referred to simply as the **gradient** when context is clear.
 
 This gradient image is commonly used in edge detection and image enhancement.
 
-- The components of the gradient vector (`∂f/∂x` and `∂f/∂y`) are **linear operators**.
-- However, the **gradient magnitude** is **nonlinear**, due to the squaring and square root operations.
-- While partial derivatives are **not rotation invariant**, the **gradient magnitude is** (∇f is not rotation invariant while ∣∇f∣ is rotation invariant).
-- Edge detection algorithms often use gradient magnitude. Since edges are defined by intensity changes, not their orientation, rotation invariance ensures that edges are detected equally well regardless of how the object is oriented.
+-   The components of the gradient vector (`∂f/∂x` and `∂f/∂y`) are **linear operators**.
+-   However, the **gradient magnitude** is **nonlinear**, due to the squaring and square root operations.
+-   While partial derivatives are **not rotation invariant**, the **gradient magnitude is** (∇f is not rotation invariant while ∣∇f∣ is rotation invariant).
+-   Edge detection algorithms often use gradient magnitude. Since edges are defined by intensity changes, not their orientation, rotation invariance ensures that edges are detected equally well regardless of how the object is oriented.
 
 #### Approximate Gradient Magnitude
 
 To simplify computations, the exact magnitude is often approximated using **absolute values**:
 
-$M(x, y) \approx |\frac{\partial f}{\partial x}| + |\frac{\partial f}{\partial y}|$  *(Eq. 3-59)*
+$M(x, y) \approx |\frac{\partial f}{\partial x}| + |\frac{\partial f}{\partial y}|$ _(Eq. 3-59)_
 
-- This approximation reduces computational cost.
-- **Isotropy** (invariance under rotation) is generally **not preserved**, except at multiples of 90°, depending on the kernels used. The most popular kernels used to
-approximate the gradient are isotropic at multiples of 90°. These results are independent, so nothing of significance is lost in using the latter equation if we choose to do so.
+-   This approximation reduces computational cost.
+-   **Isotropy** (invariance under rotation) is generally **not preserved**, except at multiples of 90°, depending on the kernels used. The most popular kernels used to
+    approximate the gradient are isotropic at multiples of 90°. These results are independent, so nothing of significance is lost in using the latter equation if we choose to do so.
+
 ---
 
 ### Discrete Gradient Approximations and Kernel Formulation
@@ -954,8 +957,8 @@ z7 z8 z9
 
 #### Basic First-Order Differences
 
-- Horizontal difference: $g_x = z_8 - z_5$
-- Vertical difference: $g_y = z_6 - z_5$
+-   Horizontal difference: $g_x = z_8 - z_5$
+-   Vertical difference: $g_y = z_6 - z_5$
 
 These are derived from simple forward difference approximations.
 
@@ -963,21 +966,23 @@ These are derived from simple forward difference approximations.
 
 Proposed by Roberts (1965), this uses **cross differences**:
 
-*(Eq. 3-60)*
-- $g_x = z_9 - z_5$
-- $g_y = z_8 - z_6$
+_(Eq. 3-60)_
+
+-   $g_x = z_9 - z_5$
+-   $g_y = z_8 - z_6$
+
 ---
 
 ### Gradient Magnitude Using Roberts Operator
 
-- **Exact** magnitude using squared terms:
+-   **Exact** magnitude using squared terms:
 
-  $M(x, y) = \sqrt{(z_9 - z_5)^2 + (z_8 - z_6)^2}$ 
-  *(Derived from Eq. 3-58 & 3-60)*
+    $M(x, y) = \sqrt{(z_9 - z_5)^2 + (z_8 - z_6)^2}$
+    _(Derived from Eq. 3-58 & 3-60)_
 
-- **Approximated** magnitude using absolute values:
+-   **Approximated** magnitude using absolute values:
 
-  $M(x, y) \approx |z_9 - z_5| + |z_8 - z_6|$`    
+    $M(x, y) \approx |z_9 - z_5| + |z_8 - z_6|$`
 
 These expressions form the **gradient image** over the domain of `x` and `y`.
 
@@ -987,7 +992,8 @@ These expressions form the **gradient image** over the domain of `x` and `y`.
 
 The cross differences in Eq. (3-60) are implemented using **Roberts cross-gradient kernels**:
 
-- For $g_x = z_9 - z_5$:  
+-   For $g_x = z_9 - z_5$:
+
 ```
 
 [-1  0]
@@ -995,7 +1001,8 @@ The cross differences in Eq. (3-60) are implemented using **Roberts cross-gradie
 
 ```
 
-- For $g_y = z_8 - z_6$:
+-   For $g_y = z_8 - z_6$:
+
 ```
 
 [0 -1]
@@ -1003,18 +1010,19 @@ The cross differences in Eq. (3-60) are implemented using **Roberts cross-gradie
 
 ```
 
-These kernels uses 2×2 kernels and are **sensitive to diagonal edges** and were historically among the first used for edge detection and is referred to as the *Roberts cross-gradient operators*. 
+These kernels uses 2×2 kernels and are **sensitive to diagonal edges** and were historically among the first used for edge detection and is referred to as the _Roberts cross-gradient operators_.
 
-#### Sobel Operator 
+#### Sobel Operator
 
-- Modern and Common
-- Uses 3×3 kernels with more smoothing
+-   Modern and Common
+-   Uses 3×3 kernels with more smoothing
 
 ### Sobel Approximation of Partial Derivatives
 
 The partial derivatives `g_x` and `g_y` are approximated over a $3 \times 3$ neighborhood centered on `z_5` as follows:
 
 #### Horizontal Gradient (∂f/∂x):
+
 ```math
 g_x = (z_7 + 2z_8 + z_9) - (z_1 + 2z_2 + z_3)
 ```
@@ -1027,7 +1035,7 @@ g_y = (z_3 + 2z_6 + z_9) - (z_1 + 2z_4 + z_7)
 
 These can be implemented by convolving the image with the **Sobel kernels**:
 
-* For `g_x`:
+-   For `g_x`:
 
 ```
 [-1  0  1]
@@ -1035,15 +1043,13 @@ These can be implemented by convolving the image with the **Sobel kernels**:
 [-1  0  1]
 ```
 
-* For $g_y$:
+-   For $g_y$:
 
 ```
 [-1 -2 -1]
 [ 0  0  0]
 [ 1  2  1]
 ```
-
-
 
 These kernels compute the differences between the first and third rows or columns, effectively capturing changes in intensity along `x` and `y` directions, respectively.
 
@@ -1065,19 +1071,18 @@ M(x, y) = \sqrt{g_x^2 + g_y^2}
 M(x, y) \approx |g_x| + |g_y|
 ```
 
-$M(x, y) = \sqrt{[(z_7 + 2z_8 + z_9) - (z_1 + 2z_2 + z_3)]^2 + [(z_3 + 2z_6 + z_9) - (z_1 + 2z_4 + z_7)]^2}$  
+$M(x, y) = \sqrt{[(z_7 + 2z_8 + z_9) - (z_1 + 2z_2 + z_3)]^2 + [(z_3 + 2z_6 + z_9) - (z_1 + 2z_4 + z_7)]^2}$
 
 This expression indicates that the magnitude of the gradient at `(x, y)` is the square root of the sum of squares of the Sobel-filtered responses in the `x` and `y` directions.
 
 ### Properties of Sobel Kernels
 
-- The **center coefficients** have a weight of 2 to emphasize the central row/column, achieving smoothing alongside differentiation.
-- The **sum of all kernel coefficients is zero**, ensuring a zero response in regions of **constant intensity**, as expected from a derivative operator.
-- Convolution with these kernels often produces **negative values**, requiring further processing for visualization.
-- The computations of $g_x$ and $g_y$ are **linear** and performed via convolution.
-- The magnitude calculation `M(x, y)` is **nonlinear** due to the use of squaring and square roots (or absolute values in approximations).
+-   The **center coefficients** have a weight of 2 to emphasize the central row/column, achieving smoothing alongside differentiation.
+-   The **sum of all kernel coefficients is zero**, ensuring a zero response in regions of **constant intensity**, as expected from a derivative operator.
+-   Convolution with these kernels often produces **negative values**, requiring further processing for visualization.
+-   The computations of $g_x$ and $g_y$ are **linear** and performed via convolution.
+-   The magnitude calculation `M(x, y)` is **nonlinear** due to the use of squaring and square roots (or absolute values in approximations).
 
 The **Sobel operator** is a widely used method for edge detection, providing both differentiation and smoothing. It yields robust results in practice due to its simplicity and effectiveness in detecting intensity transitions in an image, and is isotropic under rotations of `90°`.
 
 ---
-
