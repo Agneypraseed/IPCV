@@ -397,10 +397,10 @@ where $\sigma_2 > \sigma_1$.
 
 ## Relationship to Human Vision
 
-Experimental results suggest that certain *channels* in the human vision system are selective for both **orientation** and **frequency**. These can be modeled using above equation with a **ratio of standard deviations** of:
+Experimental results suggest that certain _channels_ in the human vision system are selective for both **orientation** and **frequency**. These can be modeled using above equation with a **ratio of standard deviations** of:
 
-- $1.75:1$ — matches physiological observations.
-- $1.6:1$ — provides a closer *engineering approximation* to the LoG function (Marr and Hildreth, 1980).
+-   $1.75:1$ — matches physiological observations.
+-   $1.6:1$ — provides a closer _engineering approximation_ to the LoG function (Marr and Hildreth, 1980).
 
 ---
 
@@ -442,72 +442,347 @@ This function performs within approximately **20%** of the optimal numerical sol
 For 2-D images, the process is applied in the **direction of the edge normal**. Since this direction is not known in advance, the method approximates it by:
 
 1. **Smoothing** the image with a 2-D Gaussian function:
-   $$
-   G(x, y) = e^{-\frac{x^2 + y^2}{2\sigma^2}}   
-   $$
+    $$
+    G(x, y) = e^{-\frac{x^2 + y^2}{2\sigma^2}}
+    $$
 2. **Convolving** the image with $G(x, y)$:
-   $$
-   f_s(x, y) = f(x, y) * G(x, y)   
-   $$
+    $$
+    f_s(x, y) = f(x, y) * G(x, y)
+    $$
 3. **Computing the gradient magnitude and angle**:
-   $$
-   M_s(x, y) = \sqrt{g_x^2(x, y) + g_y^2(x, y)}   
-   $$
-   $$
-   \alpha(x, y) = \tan^{-1} \left( \frac{g_y(x, y)}{g_x(x, y)} \right)   
-   $$
-   where $g_x = \frac{\partial f_s}{\partial x}$ and $g_y = \frac{\partial f_s}{\partial y}$.
+    $$
+    M_s(x, y) = \sqrt{g_x^2(x, y) + g_y^2(x, y)}
+    $$
+    $$
+    \alpha(x, y) = \tan^{-1} \left( \frac{g_y(x, y)}{g_x(x, y)} \right)
+    $$
+    where $g_x = \frac{\partial f_s}{\partial x}$ and $g_y = \frac{\partial f_s}{\partial y}$.
 
 ---
 
 ## Non-Maxima Suppression
 
-The gradient magnitude image $M_s(x, y)$ typically contains **thick ridges**. Non-maxima suppression is applied to thin these ridges:
+The gradient magnitude image $M_s(x, y)$ typically contains **wide ridges** around local maxima. To produce thin edges, we apply **non-maxima suppression**.
 
-1. **Quantize** the gradient direction $\alpha(x, y)$ into four categories:
-   - Horizontal ($0^\circ$)
-   - $+45^\circ$
-   - Vertical ($90^\circ$)
-   - $-45^\circ$
-2. For each pixel:
-   - Compare $M_s(x, y)$ to its two neighbors along the quantized direction.
-   - If $M_s(x, y)$ is not greater than both neighbors, set it to zero.
+-   The goal of non-maximum suppression is to thin these ridges down to single-pixel-wide lines, preserving only the pixels that are the true "peak" of the ridge.
 
-This produces a thinned **non-maxima suppressed image** $g_N(x, y)$.
+The core idea is : "An edge pixel should only survive if its gradient magnitude is greater than its two neighbors in the direction perpendicular to the edge."
+Since the gradient direction is always perpendicular to the edge, this is the same as saying:
+
+-   "A pixel p is an edge pixel only if its gradient magnitude is greater than the magnitudes of its two neighbors along the gradient direction."
+
+#### Discrete Edge Orientations
+
+![alt text](/images/image86.png)
+
+In a $3 \times 3$ neighborhood, the **edge normal** (i.e., gradient vector direction) is quantized into **four orientations**:
+
+-   Horizontal ($0^\circ$)
+-   Vertical ($90^\circ$)
+-   $+45^\circ$
+-   $-45^\circ$
+
+For example:
+
+-   A horizontal edge corresponds to edge normals in the ranges:
+    $$
+    -22.5^\circ \leq \alpha(x, y) \leq 22.5^\circ
+    \quad \text{or} \quad
+    157.5^\circ \leq \alpha(x, y) \leq -157.5^\circ
+    $$
+-   Similar angular ranges define the remaining three orientations.
+
+## Algorithm
+
+Let $d_1, d_2, d_3, d_4$ denote the four possible edge directions (horizontal, $-45^\circ$, vertical, $+45^\circ$).  
+For a pixel centered at $(x, y)$:
+
+1. **Find the closest orientation** $d_k$ to the gradient direction $\alpha(x, y)$.
+2. Let $K = f_s(x, y)$.
+    - Compare $K$ with its two neighbors along direction $d_k$.
+    - If $K$ is smaller than at least one of its neighbors → **suppress**:
+        $$
+        g_N(x, y) = 0
+        $$
+    - Otherwise, keep the value:
+        $$
+        g_N(x, y) = K
+        $$
+
+---
+
+#### Result
+
+Repeating this procedure for all pixels produces the **non-maxima suppressed image**:
+
+$$
+g_N(x, y) = \text{NonMaximaSuppression}(f_s(x, y))
+$$
+
+-   Same size as $f_s(x, y)$
+-   Contains **only thinned edges**
+-   Example: if $(x, y) = p_5$ lies on a horizontal edge, then the neighbors checked in Step 2 are $p_2$ and $p_8$.
+
+Thus, $g_N(x, y)$ is equal to the smoothed gradient image $f_s(x, y)$ **with non-maxima points suppressed**.
+
+---
+
+**The Algorithm (Step-by-Step):**
+
+For every pixel `p` in the gradient magnitude image:
+
+1.  **Find the Gradient Direction:** Calculate the angle of the gradient vector at pixel `p`. Let's say the angle is `α`.
+
+2.  **Quantize the Direction:** Use the "pie chart" from to determine which of the four main directions (`horizontal`, `vertical`, `+45°`, `-45°`) the angle `α` falls into. This tells you the approximate orientation of the gradient.
+
+3.  **Find the Two Neighbors:** Based on the quantized direction from Step 2, identify the two immediate neighboring pixels that lie along this direction.
+
+    -   If direction is **Horizontal** (gradient is vertical), the neighbors are the pixels **above** and **below** `p`.
+    -   If direction is **Vertical** (gradient is horizontal), the neighbors are the pixels **left** and **right** of `p`.
+    -   If direction is **+45°** (gradient is -45°), the neighbors are the pixels to the **top-right** and **bottom-left** of `p`.
+    -   If direction is **-45°** (gradient is +45°), the neighbors are the pixels to the **top-left** and **bottom-right** of `p`.
+
+4.  **Compare Magnitudes (The "Suppression" Step):**
+    -   Compare the gradient magnitude of the center pixel `p` with the gradient magnitudes of the two neighbors you just identified.
+    -   **IF** the magnitude of `p` is greater than or equal to **BOTH** of its neighbors, it is a local maximum. Keep its value.
+    -   **ELSE** (if `p` is smaller than at least one of its neighbors), it is not the peak of the ridge. **Suppress** it by setting its value to **0**.
+
+After applying this process to every pixel, the only pixels with non-zero values will be the thin, one-pixel-wide ridges that represent the final edges.
 
 ---
 
 ### Double Thresholding and Edge Tracking
 
+The final step is to **threshold** the non-maxima suppressed image $g_N(x, y)$ in order to reduce false edge points.
+
+In the **Marr-Hildreth algorithm**, a **single threshold** was applied:
+
+-   If $g_N(x, y) < T$, then $g_N(x, y) = 0$.
+-   Otherwise, $g_N(x, y)$ is retained.
+
+**Limitations**:
+
+-   If $T$ is **too low** → many **false positives** (spurious edges).
+-   If $T$ is **too high** → many **false negatives** (valid edges removed).
+
+Canny’s algorithm attempts to improve on this situation by using hysteresis thresholding.
+
+Using hysteresis thresholding Canny’s algorithm improves robustness by using **two thresholds**:
+
+- **Low threshold**: $T_L$  
+- **High threshold**: $T_H$
+
+Experimental evidence (Canny, 1986) suggests the ratio:
+
+$$
+\frac{T_H}{T_L} \in [2:1, \; 3:1]
+$$
+
+**Process**:
+
 To reduce false edges:
 
 1. Apply **two thresholds**:
-   - **High threshold** $T_H$
-   - **Low threshold** $T_L$
+    - **High threshold** $T_H$
+    - **Low threshold** $T_L$
 2. Classify:
-   - Pixels with $M_s(x, y) \ge T_H$ → **strong edges**
-   - Pixels with $T_L \le M_s(x, y) < T_H$ → **weak edges**
+    - Pixels with $M_s(x, y) \ge T_H$ → **strong edges**
+    - Pixels with $T_L \le M_s(x, y) < T_H$ → **weak edges**
+    - Pixels with $g_N(x, y) < T_L$ → **suppressed** (set to 0). 
 3. **Edge linking**:
-   - Include weak edges that are **8-connected** to any strong edge.
-   - Discard all other weak edges.
+    - Include weak edges that are **8-connected** to any strong edge.
+    - Discard all other weak edges.
 
-Experimental evidence suggests $T_H : T_L$ ratios in the range **2:1** to **3:1**.
+We can visualize the thresholding operation as creating **two auxiliary images**:
+
+$$
+g_{NH}(x,y) = 
+\begin{cases} 
+g_N(x,y), & g_N(x,y) \geq T_H \\ 
+0, & \text{otherwise} 
+\end{cases}
+$$
+
+$$
+g_{NL}(x,y) = 
+\begin{cases} 
+g_N(x,y), & g_N(x,y) \geq T_L \\ 
+0, & \text{otherwise} 
+\end{cases}
+$$
+
+Initially, both $g_{NH}(x,y)$ and $g_{NL}(x,y)$ are set to zero.  
+After thresholding:
+
+- $g_{NH}(x,y)$ typically contains **fewer nonzero pixels** than $g_{NL}(x,y)$.  
+- All nonzero pixels of $g_{NH}(x,y)$ are included in $g_{NL}(x,y)$ because $T_H > T_L$.  
+
+To isolate weak edges:
+
+$$
+g_{NL}(x,y) = g_{NL}(x,y) - g_{NH}(x,y)
+$$
+
+- Nonzero pixels in $g_{NH}(x,y)$ → **strong edge pixels**  
+- Remaining nonzero pixels in $g_{NL}(x,y)$ → **weak edge pixels**  
 
 ---
 
-### Summary of the Canny Algorithm
+### Edge Linking Procedure
 
-1. Smooth the input image with a Gaussian filter.
-2. Compute gradient magnitude and direction.
-3. Apply non-maxima suppression.
-4. Perform double thresholding and edge linking.
-5. (Optional) Apply final edge thinning for single-pixel-wide edges.
-
----
-
-- The Gaussian kernel $G(x, y)$ is **separable** into the product of two 1-D Gaussians.  
-  This allows Step 1 to be implemented using **two 1-D convolutions** instead of a single 2-D convolution.
-- Gradient computations can also be implemented with **1-D derivative kernels**, further improving efficiency.
+1. **Locate** the next unvisited strong edge pixel $p \in g_{NH}(x,y)$.  
+2. **Mark as valid** all weak pixels in $g_{NL}(x,y)$ that are **8-connected** to $p$.  
+3. **Repeat** Step 1 until all strong pixels have been visited.  
+4. **Suppress** all unmarked pixels in $g_{NL}(x,y)$ by setting them to zero.  
 
 ---
 
+### Final Edge Map
+
+The final output of the Canny algorithm is obtained by **combining**:
+
+$$
+g_{\text{final}}(x,y) = g_{NH}(x,y) \; \text{union} \; g_{NL}(x,y)
+$$
+
+- All strong edges are preserved.  
+- Validated weak edges are appended to form continuous edges.  
+
+---
+### Canny Hysteresis Thresholding — Worked Example
+
+#### Setup
+
+- Non-maximum-suppressed magnitude image $g_N \in \mathbb{R}^{7\times7}$
+- Thresholds: $T_H = 10,\; T_L = 5$ (ratio $=2{:}1$)
+
+`g_N`:
+```
+0  0  0  0  6  0  0
+0 12  7  0  0  0  0
+0  6 11  8  0  0  0
+0  0  5 13  9  0  0
+0  0  0  6 12  0  0
+0  0  0  0  7 11  0
+0  0  0  0  0  0  0
+```
+
+**Notes.** A true diagonal edge contains strong responses: `12, 11, 13, 12, 11`. Weak neighbors appear around it (`5, 6, 7, 8, 9`). A stray weak pixel at $(1,5)=6$ is not connected to that edge.
+
+---
+
+#### 1) Threshold into **strong** and **weak**
+
+**Strong** (`g_NH`, keep $\ge T_H$):
+```
+0  0  0  0  0  0  0
+0 12  0  0  0  0  0
+0  0 11  0  0  0  0
+0  0  0 13  0  0  0
+0  0  0  0 12  0  0
+0  0  0  0  0 11  0
+0  0  0  0  0  0  0
+```
+
+**Low** (`g_NL`, keep $\ge T_L$) — *before removing strong*:
+```
+0  0  0  0  6  0  0
+0 12  7  0  0  0  0
+0  6 11  8  0  0  0
+0  0  5 13  9  0  0
+0  0  0  6 12  0  0
+0  0  0  0  7 11  0
+0  0  0  0  0  0  0
+```
+
+Isolate **weak-only** pixels:
+$$
+\text{weak\_only} \;=\; g_{NL} - g_{NH}
+$$
+
+`weak_only`:
+```
+0  0  0  0  6  0  0
+0  0  7  0  0  0  0
+0  6  0  8  0  0  0
+0  0  5  0  9  0  0
+0  0  0  6  0  0  0
+0  0  0  0  7  0  0
+0  0  0  0  0  0  0
+```
+
+---
+
+#### 2) Edge linking (hysteresis with 8-connectivity)
+
+- From each strong pixel in `g_NH`, **grow** into `weak_only` via 8-connectivity (neighbors include diagonals).
+- Keep any weak pixel that is connected (directly or through a chain) to at least one strong pixel.
+
+**Kept weak pixels (connected to the diagonal strong edge):**
+$(2,3)=7,\; (3,2)=6,\; (3,4)=8,\; (4,3)=5,\; (4,5)=9,\; (5,4)=6,\; (6,5)=7$.
+
+**Discarded**: stray weak $(1,5)=6$ (no connection to any strong pixel).
+
+`g_NL` **after linking** (validated weak only):
+```
+0  0  0  0  0  0  0
+0  0  7  0  0  0  0
+0  6  0  8  0  0  0
+0  0  5  0  9  0  0
+0  0  0  6  0  0  0
+0  0  0  0  7  0  0
+0  0  0  0  0  0  0
+```
+
+---
+
+#### 3) Final edge map
+
+Combine strong and validated weak:
+$$
+g_{\text{final}} \;=\; g_{NH} \;\cup\; g_{NL}\;.
+$$
+
+`g_final`:
+```
+0  0  0  0  0  0  0
+0 12  7  0  0  0  0
+0  6 11  8  0  0  0
+0  0  5 13  9  0  0
+0  0  0  6 12  0  0
+0  0  0  0  7 11  0
+0  0  0  0  0  0  0
+```
+
+---
+
+#### What did hysteresis fix?
+
+- **Single high threshold ($T=10$)**: keeps only strong diagonals → **broken, fragmented edge**.
+- **Single low threshold ($T=5$)**: keeps diagonal **and** stray noise at $(1,5)$ → **false positive**.
+- **Hysteresis ($T_H=10$, $T_L=5$)**: keeps full diagonal (strong + connected weak) and **drops unconnected weak noise** automatically.
+
+**Core idea**: seed with **confident** edges (high threshold), then **extend** through weaker segments **only when connected** to those seeds.
+
+---
+
+
+### Summary of the Canny Edge Detection Algorithm
+
+The **Canny algorithm** can be summarized as the following sequence of steps:
+
+1. **Smoothing**: Convolve the input image with a **Gaussian filter** of standard deviation $\sigma$ to reduce noise.  
+   - Choose an appropriate kernel size $n \times n$ based on $\sigma$.  
+   - The Gaussian filter is separable: 2-D convolution can be performed as two 1-D convolutions (rows and columns).
+
+2. **Gradient Computation**: Compute the **gradient magnitude** $f_s(x,y)$ and **gradient angle** $\alpha(x,y)$ at each pixel.  
+   - Gradient computations can also be performed using 1-D convolution approximations.
+
+3. **Nonmaxima Suppression**: Thin the gradient magnitude image by suppressing pixels that are **not local maxima** along the gradient direction.
+
+4. **Double Thresholding and Edge Linking**:  
+   - Apply **hysteresis thresholding** with thresholds $T_L$ and $T_H$.  
+   - Classify pixels as **strong** ($\geq T_H$) or **weak** ($\geq T_L$).  
+   - Use **connectivity analysis** to link weak pixels connected to strong pixels, forming continuous edges.
+
+---
