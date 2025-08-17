@@ -373,3 +373,141 @@ Applying the Marr-Hildreth edge detection method to a grayscale building image.
     1 pixel thick - **1-pixel-thick edges** simplify subsequent steps such as **edge linking** and **region segmentation**.
 
 ---
+
+#### Huertas & Medioni's Subpixel Method
+
+If the accuracy of the zero-crossing locations found using the Marr-Hildreth edge-detection method is inadequate in a particular application, then a technique proposed by Huertas and Medioni for finding zero crossings with subpixel accuracy can be employed.
+
+-   Fits a smooth curve to better pinpoint the edge location
+-   Best for applications needing very precise edge detection, like medical imaging
+
+---
+
+### Approximate the **Laplacian of Gaussian (LoG)** function by a **Difference of Gaussians (DoG)**:
+
+$$
+D(x, y) = \frac{1}{2\pi \sigma_1^2} e^{-\frac{x^2 + y^2}{2\sigma_1^2}}
+\;-\;
+\frac{1}{2\pi \sigma_2^2} e^{-\frac{x^2 + y^2}{2\sigma_2^2}}
+$$
+
+where $\sigma_2 > \sigma_1$.
+
+---
+
+## Relationship to Human Vision
+
+Experimental results suggest that certain *channels* in the human vision system are selective for both **orientation** and **frequency**. These can be modeled using above equation with a **ratio of standard deviations** of:
+
+- $1.75:1$ — matches physiological observations.
+- $1.6:1$ — provides a closer *engineering approximation* to the LoG function (Marr and Hildreth, 1980).
+
+---
+
+## Matching Zero Crossings
+
+To ensure that the LoG and DoG have the **same zero crossings**, the value of $\sigma$ for the LoG must satisfy:
+
+$$
+\sigma^2 =
+\frac{\sigma_1^2 \sigma_2^2}{\sigma_2^2 - \sigma_1^2}
+\ln\left(\frac{\sigma_2}{\sigma_1}\right)
+$$
+
+Although their **zero crossings** match when this equation is satisfied, their **amplitude scales** will differ. To make them comparable, both functions are scaled so that they have the same value at the origin.
+
+---
+
+## The Canny Edge Detector
+
+The **Canny edge detector** (Canny, 1986) is a multi-stage algorithm designed to produce optimal edge detection results based on three primary objectives:
+
+1. **Low error rate** — Detect all true edges and avoid spurious responses.
+2. **Good localization** — Edge points should be as close as possible to the true edge position.
+3. **Single response per edge** — Only one pixel should be marked for each true edge point.
+
+Canny expressed these criteria mathematically and derived an optimal detector for **1-D step edges** corrupted by additive white Gaussian noise. The result showed that a good approximation is obtained by the **first derivative of a Gaussian**:
+
+$$
+\frac{d}{dx} \left( e^{-\frac{x^2}{2\sigma^2}} \right)
+= -\frac{x}{\sigma^2} e^{-\frac{x^2}{2\sigma^2}}
+$$
+
+This function performs within approximately **20%** of the optimal numerical solution, a difference generally imperceptible in practical applications.
+
+---
+
+### Extension to 2-D
+
+For 2-D images, the process is applied in the **direction of the edge normal**. Since this direction is not known in advance, the method approximates it by:
+
+1. **Smoothing** the image with a 2-D Gaussian function:
+   $$
+   G(x, y) = e^{-\frac{x^2 + y^2}{2\sigma^2}}   
+   $$
+2. **Convolving** the image with $G(x, y)$:
+   $$
+   f_s(x, y) = f(x, y) * G(x, y)   
+   $$
+3. **Computing the gradient magnitude and angle**:
+   $$
+   M_s(x, y) = \sqrt{g_x^2(x, y) + g_y^2(x, y)}   
+   $$
+   $$
+   \alpha(x, y) = \tan^{-1} \left( \frac{g_y(x, y)}{g_x(x, y)} \right)   
+   $$
+   where $g_x = \frac{\partial f_s}{\partial x}$ and $g_y = \frac{\partial f_s}{\partial y}$.
+
+---
+
+## Non-Maxima Suppression
+
+The gradient magnitude image $M_s(x, y)$ typically contains **thick ridges**. Non-maxima suppression is applied to thin these ridges:
+
+1. **Quantize** the gradient direction $\alpha(x, y)$ into four categories:
+   - Horizontal ($0^\circ$)
+   - $+45^\circ$
+   - Vertical ($90^\circ$)
+   - $-45^\circ$
+2. For each pixel:
+   - Compare $M_s(x, y)$ to its two neighbors along the quantized direction.
+   - If $M_s(x, y)$ is not greater than both neighbors, set it to zero.
+
+This produces a thinned **non-maxima suppressed image** $g_N(x, y)$.
+
+---
+
+### Double Thresholding and Edge Tracking
+
+To reduce false edges:
+
+1. Apply **two thresholds**:
+   - **High threshold** $T_H$
+   - **Low threshold** $T_L$
+2. Classify:
+   - Pixels with $M_s(x, y) \ge T_H$ → **strong edges**
+   - Pixels with $T_L \le M_s(x, y) < T_H$ → **weak edges**
+3. **Edge linking**:
+   - Include weak edges that are **8-connected** to any strong edge.
+   - Discard all other weak edges.
+
+Experimental evidence suggests $T_H : T_L$ ratios in the range **2:1** to **3:1**.
+
+---
+
+### Summary of the Canny Algorithm
+
+1. Smooth the input image with a Gaussian filter.
+2. Compute gradient magnitude and direction.
+3. Apply non-maxima suppression.
+4. Perform double thresholding and edge linking.
+5. (Optional) Apply final edge thinning for single-pixel-wide edges.
+
+---
+
+- The Gaussian kernel $G(x, y)$ is **separable** into the product of two 1-D Gaussians.  
+  This allows Step 1 to be implemented using **two 1-D convolutions** instead of a single 2-D convolution.
+- Gradient computations can also be implemented with **1-D derivative kernels**, further improving efficiency.
+
+---
+
