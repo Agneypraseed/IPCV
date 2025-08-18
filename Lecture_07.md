@@ -785,4 +785,67 @@ The **Canny algorithm** can be summarized as the following sequence of steps:
    - Classify pixels as **strong** ($\geq T_H$) or **weak** ($\geq T_L$).  
    - Use **connectivity analysis** to link weak pixels connected to strong pixels, forming continuous edges.
 
+![alt text](/images/image87.png)
+---
+
+### Linking Edge Points
+
+When you run edge detection algorithms (like Sobel, Canny, etc.) on an image, you ideally want clean, continuous lines representing object boundaries. 
+
+However, in reality, you often get:
+Broken edges with gaps, Isolated edge pixels, Discontinuous boundaries. This happens due to noise, uneven lighting, and other real-world imperfections.
+
+The Solution: Edge Linking
+Edge linking algorithms try to connect these fragmented edge pixels into meaningful, continuous boundaries.
+
+There are two main approaches
+
+   - Local (neighborhood-based): decide links using only nearby pixels.
+
+   - Global (whole-map): use more global evidence to connect edge points (e.g., Hough transform, graph-based linking, active contours).It works with an entire edge map.  
+
+`Local processing (neighborhood-based linking)`
+
+This method examines small neighborhoods (like 3×3 pixels) around each edge point and links pixels that are "similar enough." Similarity is judged by two criteria:
+
+Magnitude Similarity: Edge pixels should have similar gradient strengths
+
+If |M(s,t) - M(x,y)| ≤ E, the magnitudes are similar enough
+M represents gradient magnitude, E is the threshold.
+
+Direction Similarity: Edge pixels should point in similar directions
+
+If |α(s,t) - α(x,y)| ≤ A, the angles are similar enough
+α represents gradient direction, A is the angle threshold
+
+Do this for all edge pixels and keep track of which pixels get linked (you can label each linked set).
+
+The preceding formulation is computationally expensive because all neighbors of
+every point have to be examined.  
+A simplification particularly well suited for real-time applications consists of the following steps:
+
+1. Compute the gradient magnitude and angle arrays, $M(x,y)$ and $\alpha(x,y)$, of the input image $f(x,y)$.  
+
+2. Form a binary image $g(x,y)$, whose value at any point $(x,y)$ is given by:  
+
+$$
+g(x,y) = 
+\begin{cases}
+1, & \text{if } M(x,y) > T_M \ \text{AND}\ \alpha(x,y) = A \pm T_A \\
+0, & \text{otherwise}
+\end{cases}
+$$  
+
+where $T_M$ is a threshold, $A$ is a specified angle direction, and $\pm T_A$ defines a “band” of acceptable directions about $A$.  
+
+3. Scan the rows of $g$ and fill (set to 1) all gaps (sets of 0’s) in each row that do not exceed a specified length, $L$. Note that, by definition, a gap is bounded at both ends by one or more 1’s. The rows are processed individually, with no “memory” kept between them.  
+
+4. To detect gaps in any other direction $u$, rotate $g$ by this angle and apply the horizontal scanning procedure in Step 3. Rotate the result back by $-u$.  
+
+---
+
+`Global Processing : Using the Hough Transform`
+
+      TBD
+
 ---
