@@ -849,3 +849,117 @@ where $T_M$ is a threshold, $A$ is a specified angle direction, and $\pm T_A$ de
       TBD
 
 ---
+## Global Thresholding
+
+When the intensity distributions of objects and background pixels are sufficiently distinct, it is possible to use a single (global) threshold applicable over the entire image. In most applications, there is usually enough variability between images that, even if global thresholding is a suitable approach, an algorithm capable of estimating the threshold value for each image is required.
+
+### Iterative Thresholding Algorithm
+
+The following iterative algorithm can be used for automatic threshold estimation:
+
+### Algorithm Steps
+
+1. **Initialize**: Select an initial estimate for the global threshold, $T$.
+
+2. **Segment**: Segment the image using $T$ in Eq. (10-46). This will produce two groups of pixels:
+   - $G_1$: consisting of pixels with intensity values $> T$
+   - $G_2$: consisting of pixels with values $\leq T$
+
+3. **Compute Means**: Compute the average (mean) intensity values $m_1$ and $m_2$ for the pixels in $G_1$ and $G_2$, respectively.
+
+4. **Update Threshold**: Compute a new threshold value midway between $m_1$ and $m_2$:
+   
+   $$T = \frac{1}{2}(m_1 + m_2)$$
+
+5. **Iterate**: Repeat Steps 2 through 4 until the difference between values of $T$ in successive iterations is smaller than a predefined value, $\Delta T$.
+
+- When the image histogram shows two modes (object vs. background) with a clear valley, the method is especially effective.
+- If min(I) < T^(0) < max(I), the procedure converges in a finite number of iterations, even if the modes are not perfectly separable.
+- Efficiency tip: Instead of repeatedly thresholding the image, equivalent computations can be done directly from the (single) image histogram.
+- Typical parameterization:
+  - T^(0): image mean or mid-range (min+max)/2
+  - ΔT: small positive value (e.g., 0–1 for 8-bit images)
+- Output: the final T can be rounded to the nearest integer for 8-bit images.
+
+---
+
+## VARIABLE THRESHOLDING
+
+Noise and nonuniform illumination can severely limit the effectiveness of global thresholding. Preprocessing (e.g., smoothing, edge cues) may help, but in many cases it is insufficient. A more robust strategy is to let the threshold vary across the image, adapting to local statistics.
+ 
+
+A basic approach to variable thresholding is to compute a threshold at every point, $(x, y)$, in the image based on one or more specified properties in a neighborhood of $(x, y)$. 
+
+We illustrate the approach using the mean and standard deviation of the pixel values in a neighborhood of every point in an image. These two quantities are useful for determining local thresholds because, they are descriptors of average intensity and contrast.
+
+#### Notation
+- $m_{xy}$: mean of the set of pixel values in a neighborhood $S_{xy}$
+- $\sigma_{xy}$: standard deviation of the set of pixel values in neighborhood $S_{xy}$
+- $S_{xy}$: neighborhood centered at coordinates $(x, y)$ in an image  
+
+### Common Forms of Variable Thresholds
+
+#### Form 1: Local Mean and Standard Deviation
+
+$$
+T_{xy} = a \cdot \sigma_{xy} + b \cdot m_{xy}
+$$
+
+where $a$ and $b$ are nonnegative constants.
+
+#### Form 2: Global Mean with Local Standard Deviation
+
+$$
+T_{xy} = a \cdot \sigma_{xy} + b \cdot m_G
+$$
+
+where $m_G$ is the global image mean.
+
+### Segmentation Process
+
+The segmented image is computed as:
+
+$$
+g_{xy} = 
+\begin{cases}
+1 & \text{if } f(x, y) > T_{xy} \\
+0 & \text{if } f(x, y) \leq T_{xy}
+\end{cases}
+$$
+
+where:
+- $f(x, y)$ is the input image  
+- This equation is evaluated for all pixel locations in the image  
+- A different threshold is computed at each location $(x, y)$ using the pixels in the neighborhood $S_{xy}$  
+
+#### Notes
+- S_xy is typically an odd-sized window (e.g., 15×15) centered at (x, y).
+- Local means and variances can be computed efficiently with integral images; modern hardware makes neighborhood processing fast.
+
+#### Predicate-Based Variable Thresholding
+Significant power (with a modest increase in computation) can be added to variable thresholding by using predicates based on the parameters computed in the neighborhood of a point $(x, y)$:
+
+$$
+g_{xy} = 
+\begin{cases}
+1 & \text{if } Q(\text{local parameters}) \text{ is TRUE} \\
+0 & \text{if } Q(\text{local parameters}) \text{ is FALSE}
+\end{cases}
+$$
+
+where $Q$ is a predicate based on parameters computed using the pixels in neighborhood $S_{xy}$.
+
+### Example Predicate
+
+Consider the following predicate, $Q(m_{xy}, \sigma_{xy})$, based on the local mean and standard deviation:
+
+$$
+Q(m_{xy}, \sigma_{xy}) =
+\begin{cases}
+\text{TRUE} & \text{if } f(x, y) > a\sigma_{xy} \text{ AND } f(x, y) > b \cdot m_{xy} \\
+\text{FALSE} & \text{otherwise}
+\end{cases}
+$$
+
+---
+
