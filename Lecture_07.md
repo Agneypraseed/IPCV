@@ -569,8 +569,8 @@ Canny’s algorithm attempts to improve on this situation by using hysteresis th
 
 Using hysteresis thresholding Canny’s algorithm improves robustness by using **two thresholds**:
 
-- **Low threshold**: $T_L$  
-- **High threshold**: $T_H$
+-   **Low threshold**: $T_L$
+-   **High threshold**: $T_H$
 
 Experimental evidence (Canny, 1986) suggests the ratio:
 
@@ -588,7 +588,7 @@ To reduce false edges:
 2. Classify:
     - Pixels with $M_s(x, y) \ge T_H$ → **strong edges**
     - Pixels with $T_L \le M_s(x, y) < T_H$ → **weak edges**
-    - Pixels with $g_N(x, y) < T_L$ → **suppressed** (set to 0). 
+    - Pixels with $g_N(x, y) < T_L$ → **suppressed** (set to 0).
 3. **Edge linking**:
     - Include weak edges that are **8-connected** to any strong edge.
     - Discard all other weak edges.
@@ -596,26 +596,26 @@ To reduce false edges:
 We can visualize the thresholding operation as creating **two auxiliary images**:
 
 $$
-g_{NH}(x,y) = 
-\begin{cases} 
-g_N(x,y), & g_N(x,y) \geq T_H \\ 
-0, & \text{otherwise} 
+g_{NH}(x,y) =
+\begin{cases}
+g_N(x,y), & g_N(x,y) \geq T_H \\
+0, & \text{otherwise}
 \end{cases}
 $$
 
 $$
-g_{NL}(x,y) = 
-\begin{cases} 
-g_N(x,y), & g_N(x,y) \geq T_L \\ 
-0, & \text{otherwise} 
+g_{NL}(x,y) =
+\begin{cases}
+g_N(x,y), & g_N(x,y) \geq T_L \\
+0, & \text{otherwise}
 \end{cases}
 $$
 
 Initially, both $g_{NH}(x,y)$ and $g_{NL}(x,y)$ are set to zero.  
 After thresholding:
 
-- $g_{NH}(x,y)$ typically contains **fewer nonzero pixels** than $g_{NL}(x,y)$.  
-- All nonzero pixels of $g_{NH}(x,y)$ are included in $g_{NL}(x,y)$ because $T_H > T_L$.  
+-   $g_{NH}(x,y)$ typically contains **fewer nonzero pixels** than $g_{NL}(x,y)$.
+-   All nonzero pixels of $g_{NH}(x,y)$ are included in $g_{NL}(x,y)$ because $T_H > T_L$.
 
 To isolate weak edges:
 
@@ -623,17 +623,17 @@ $$
 g_{NL}(x,y) = g_{NL}(x,y) - g_{NH}(x,y)
 $$
 
-- Nonzero pixels in $g_{NH}(x,y)$ → **strong edge pixels**  
-- Remaining nonzero pixels in $g_{NL}(x,y)$ → **weak edge pixels**  
+-   Nonzero pixels in $g_{NH}(x,y)$ → **strong edge pixels**
+-   Remaining nonzero pixels in $g_{NL}(x,y)$ → **weak edge pixels**
 
 ---
 
 ### Edge Linking Procedure
 
-1. **Locate** the next unvisited strong edge pixel $p \in g_{NH}(x,y)$.  
-2. **Mark as valid** all weak pixels in $g_{NL}(x,y)$ that are **8-connected** to $p$.  
-3. **Repeat** Step 1 until all strong pixels have been visited.  
-4. **Suppress** all unmarked pixels in $g_{NL}(x,y)$ by setting them to zero.  
+1. **Locate** the next unvisited strong edge pixel $p \in g_{NH}(x,y)$.
+2. **Mark as valid** all weak pixels in $g_{NL}(x,y)$ that are **8-connected** to $p$.
+3. **Repeat** Step 1 until all strong pixels have been visited.
+4. **Suppress** all unmarked pixels in $g_{NL}(x,y)$ by setting them to zero.
 
 ---
 
@@ -645,18 +645,20 @@ $$
 g_{\text{final}}(x,y) = g_{NH}(x,y) \; \text{union} \; g_{NL}(x,y)
 $$
 
-- All strong edges are preserved.  
-- Validated weak edges are appended to form continuous edges.  
+-   All strong edges are preserved.
+-   Validated weak edges are appended to form continuous edges.
 
 ---
+
 ### Canny Hysteresis Thresholding — Worked Example
 
 #### Setup
 
-- Non-maximum-suppressed magnitude image $g_N \in \mathbb{R}^{7\times7}$
-- Thresholds: $T_H = 10,\; T_L = 5$ (ratio $=2{:}1$)
+-   Non-maximum-suppressed magnitude image $g_N \in \mathbb{R}^{7\times7}$
+-   Thresholds: $T_H = 10,\; T_L = 5$ (ratio $=2{:}1$)
 
 `g_N`:
+
 ```
 0  0  0  0  6  0  0
 0 12  7  0  0  0  0
@@ -674,6 +676,7 @@ $$
 #### 1) Threshold into **strong** and **weak**
 
 **Strong** (`g_NH`, keep $\ge T_H$):
+
 ```
 0  0  0  0  0  0  0
 0 12  0  0  0  0  0
@@ -684,7 +687,8 @@ $$
 0  0  0  0  0  0  0
 ```
 
-**Low** (`g_NL`, keep $\ge T_L$) — *before removing strong*:
+**Low** (`g_NL`, keep $\ge T_L$) — _before removing strong_:
+
 ```
 0  0  0  0  6  0  0
 0 12  7  0  0  0  0
@@ -696,11 +700,13 @@ $$
 ```
 
 Isolate **weak-only** pixels:
+
 $$
 \text{weak\_only} \;=\; g_{NL} - g_{NH}
 $$
 
 `weak_only`:
+
 ```
 0  0  0  0  6  0  0
 0  0  7  0  0  0  0
@@ -715,8 +721,8 @@ $$
 
 #### 2) Edge linking (hysteresis with 8-connectivity)
 
-- From each strong pixel in `g_NH`, **grow** into `weak_only` via 8-connectivity (neighbors include diagonals).
-- Keep any weak pixel that is connected (directly or through a chain) to at least one strong pixel.
+-   From each strong pixel in `g_NH`, **grow** into `weak_only` via 8-connectivity (neighbors include diagonals).
+-   Keep any weak pixel that is connected (directly or through a chain) to at least one strong pixel.
 
 **Kept weak pixels (connected to the diagonal strong edge):**
 $(2,3)=7,\; (3,2)=6,\; (3,4)=8,\; (4,3)=5,\; (4,5)=9,\; (5,4)=6,\; (6,5)=7$.
@@ -724,6 +730,7 @@ $(2,3)=7,\; (3,2)=6,\; (3,4)=8,\; (4,3)=5,\; (4,5)=9,\; (5,4)=6,\; (6,5)=7$.
 **Discarded**: stray weak $(1,5)=6$ (no connection to any strong pixel).
 
 `g_NL` **after linking** (validated weak only):
+
 ```
 0  0  0  0  0  0  0
 0  0  7  0  0  0  0
@@ -739,11 +746,13 @@ $(2,3)=7,\; (3,2)=6,\; (3,4)=8,\; (4,3)=5,\; (4,5)=9,\; (5,4)=6,\; (6,5)=7$.
 #### 3) Final edge map
 
 Combine strong and validated weak:
+
 $$
 g_{\text{final}} \;=\; g_{NH} \;\cup\; g_{NL}\;.
 $$
 
 `g_final`:
+
 ```
 0  0  0  0  0  0  0
 0 12  7  0  0  0  0
@@ -758,39 +767,39 @@ $$
 
 #### What did hysteresis fix?
 
-- **Single high threshold ($T=10$)**: keeps only strong diagonals → **broken, fragmented edge**.
-- **Single low threshold ($T=5$)**: keeps diagonal **and** stray noise at $(1,5)$ → **false positive**.
-- **Hysteresis ($T_H=10$, $T_L=5$)**: keeps full diagonal (strong + connected weak) and **drops unconnected weak noise** automatically.
+-   **Single high threshold ($T=10$)**: keeps only strong diagonals → **broken, fragmented edge**.
+-   **Single low threshold ($T=5$)**: keeps diagonal **and** stray noise at $(1,5)$ → **false positive**.
+-   **Hysteresis ($T_H=10$, $T_L=5$)**: keeps full diagonal (strong + connected weak) and **drops unconnected weak noise** automatically.
 
 **Core idea**: seed with **confident** edges (high threshold), then **extend** through weaker segments **only when connected** to those seeds.
 
 ---
 
-
 ### Summary of the Canny Edge Detection Algorithm
 
 The **Canny algorithm** can be summarized as the following sequence of steps:
 
-1. **Smoothing**: Convolve the input image with a **Gaussian filter** of standard deviation $\sigma$ to reduce noise.  
-   - Choose an appropriate kernel size $n \times n$ based on $\sigma$.  
-   - The Gaussian filter is separable: 2-D convolution can be performed as two 1-D convolutions (rows and columns).
+1. **Smoothing**: Convolve the input image with a **Gaussian filter** of standard deviation $\sigma$ to reduce noise.
 
-2. **Gradient Computation**: Compute the **gradient magnitude** $f_s(x,y)$ and **gradient angle** $\alpha(x,y)$ at each pixel.  
-   - Gradient computations can also be performed using 1-D convolution approximations.
+    - Choose an appropriate kernel size $n \times n$ based on $\sigma$.
+    - The Gaussian filter is separable: 2-D convolution can be performed as two 1-D convolutions (rows and columns).
+
+2. **Gradient Computation**: Compute the **gradient magnitude** $f_s(x,y)$ and **gradient angle** $\alpha(x,y)$ at each pixel.
+
+    - Gradient computations can also be performed using 1-D convolution approximations.
 
 3. **Nonmaxima Suppression**: Thin the gradient magnitude image by suppressing pixels that are **not local maxima** along the gradient direction.
 
-4. **Double Thresholding and Edge Linking**:  
-   - Apply **hysteresis thresholding** with thresholds $T_L$ and $T_H$.  
-   - Classify pixels as **strong** ($\geq T_H$) or **weak** ($\geq T_L$).  
-   - Use **connectivity analysis** to link weak pixels connected to strong pixels, forming continuous edges.
+4. **Double Thresholding and Edge Linking**:
+    - Apply **hysteresis thresholding** with thresholds $T_L$ and $T_H$.
+    - Classify pixels as **strong** ($\geq T_H$) or **weak** ($\geq T_L$).
+    - Use **connectivity analysis** to link weak pixels connected to strong pixels, forming continuous edges.
 
-![alt text](/images/image87.png)
----
+## ![alt text](/images/image87.png)
 
 ### Linking Edge Points
 
-When you run edge detection algorithms (like Sobel, Canny, etc.) on an image, you ideally want clean, continuous lines representing object boundaries. 
+When you run edge detection algorithms (like Sobel, Canny, etc.) on an image, you ideally want clean, continuous lines representing object boundaries.
 
 However, in reality, you often get:
 Broken edges with gaps, Isolated edge pixels, Discontinuous boundaries. This happens due to noise, uneven lighting, and other real-world imperfections.
@@ -800,9 +809,9 @@ Edge linking algorithms try to connect these fragmented edge pixels into meaning
 
 There are two main approaches
 
-   - Local (neighborhood-based): decide links using only nearby pixels.
+-   Local (neighborhood-based): decide links using only nearby pixels.
 
-   - Global (whole-map): use more global evidence to connect edge points (e.g., Hough transform, graph-based linking, active contours).It works with an entire edge map.  
+-   Global (whole-map): use more global evidence to connect edge points (e.g., Hough transform, graph-based linking, active contours).It works with an entire edge map.
 
 `Local processing (neighborhood-based linking)`
 
@@ -824,23 +833,23 @@ The preceding formulation is computationally expensive because all neighbors of
 every point have to be examined.  
 A simplification particularly well suited for real-time applications consists of the following steps:
 
-1. Compute the gradient magnitude and angle arrays, $M(x,y)$ and $\alpha(x,y)$, of the input image $f(x,y)$.  
+1. Compute the gradient magnitude and angle arrays, $M(x,y)$ and $\alpha(x,y)$, of the input image $f(x,y)$.
 
-2. Form a binary image $g(x,y)$, whose value at any point $(x,y)$ is given by:  
+2. Form a binary image $g(x,y)$, whose value at any point $(x,y)$ is given by:
 
 $$
-g(x,y) = 
+g(x,y) =
 \begin{cases}
 1, & \text{if } M(x,y) > T_M \ \text{AND}\ \alpha(x,y) = A \pm T_A \\
 0, & \text{otherwise}
 \end{cases}
-$$  
+$$
 
-where $T_M$ is a threshold, $A$ is a specified angle direction, and $\pm T_A$ defines a “band” of acceptable directions about $A$.  
+where $T_M$ is a threshold, $A$ is a specified angle direction, and $\pm T_A$ defines a “band” of acceptable directions about $A$.
 
-3. Scan the rows of $g$ and fill (set to 1) all gaps (sets of 0’s) in each row that do not exceed a specified length, $L$. Note that, by definition, a gap is bounded at both ends by one or more 1’s. The rows are processed individually, with no “memory” kept between them.  
+3. Scan the rows of $g$ and fill (set to 1) all gaps (sets of 0’s) in each row that do not exceed a specified length, $L$. Note that, by definition, a gap is bounded at both ends by one or more 1’s. The rows are processed individually, with no “memory” kept between them.
 
-4. To detect gaps in any other direction $u$, rotate $g$ by this angle and apply the horizontal scanning procedure in Step 3. Rotate the result back by $-u$.  
+4. To detect gaps in any other direction $u$, rotate $g$ by this angle and apply the horizontal scanning procedure in Step 3. Rotate the result back by $-u$.
 
 ---
 
@@ -849,6 +858,7 @@ where $T_M$ is a threshold, $A$ is a specified angle direction, and $\pm T_A$ de
       TBD
 
 ---
+
 ## Global Thresholding
 
 When the intensity distributions of objects and background pixels are sufficiently distinct, it is possible to use a single (global) threshold applicable over the entire image. In most applications, there is usually enough variability between images that, even if global thresholding is a suitable approach, an algorithm capable of estimating the threshold value for each image is required.
@@ -862,40 +872,41 @@ The following iterative algorithm can be used for automatic threshold estimation
 1. **Initialize**: Select an initial estimate for the global threshold, $T$.
 
 2. **Segment**: Segment the image using $T$ in Eq. (10-46). This will produce two groups of pixels:
-   - $G_1$: consisting of pixels with intensity values $> T$
-   - $G_2$: consisting of pixels with values $\leq T$
+
+    - $G_1$: consisting of pixels with intensity values $> T$
+    - $G_2$: consisting of pixels with values $\leq T$
 
 3. **Compute Means**: Compute the average (mean) intensity values $m_1$ and $m_2$ for the pixels in $G_1$ and $G_2$, respectively.
 
 4. **Update Threshold**: Compute a new threshold value midway between $m_1$ and $m_2$:
-   
-   $$T = \frac{1}{2}(m_1 + m_2)$$
+
+    $$T = \frac{1}{2}(m_1 + m_2)$$
 
 5. **Iterate**: Repeat Steps 2 through 4 until the difference between values of $T$ in successive iterations is smaller than a predefined value, $\Delta T$.
 
-- When the image histogram shows two modes (object vs. background) with a clear valley, the method is especially effective.
-- If min(I) < T^(0) < max(I), the procedure converges in a finite number of iterations, even if the modes are not perfectly separable.
-- Efficiency tip: Instead of repeatedly thresholding the image, equivalent computations can be done directly from the (single) image histogram.
-- Typical parameterization:
-  - T^(0): image mean or mid-range (min+max)/2
-  - ΔT: small positive value (e.g., 0–1 for 8-bit images)
-- Output: the final T can be rounded to the nearest integer for 8-bit images.
+-   When the image histogram shows two modes (object vs. background) with a clear valley, the method is especially effective.
+-   If min(I) < T^(0) < max(I), the procedure converges in a finite number of iterations, even if the modes are not perfectly separable.
+-   Efficiency tip: Instead of repeatedly thresholding the image, equivalent computations can be done directly from the (single) image histogram.
+-   Typical parameterization:
+    -   T^(0): image mean or mid-range (min+max)/2
+    -   ΔT: small positive value (e.g., 0–1 for 8-bit images)
+-   Output: the final T can be rounded to the nearest integer for 8-bit images.
 
 ---
 
 ## VARIABLE THRESHOLDING
 
 Noise and nonuniform illumination can severely limit the effectiveness of global thresholding. Preprocessing (e.g., smoothing, edge cues) may help, but in many cases it is insufficient. A more robust strategy is to let the threshold vary across the image, adapting to local statistics.
- 
 
-A basic approach to variable thresholding is to compute a threshold at every point, $(x, y)$, in the image based on one or more specified properties in a neighborhood of $(x, y)$. 
+A basic approach to variable thresholding is to compute a threshold at every point, $(x, y)$, in the image based on one or more specified properties in a neighborhood of $(x, y)$.
 
 We illustrate the approach using the mean and standard deviation of the pixel values in a neighborhood of every point in an image. These two quantities are useful for determining local thresholds because, they are descriptors of average intensity and contrast.
 
 #### Notation
-- $m_{xy}$: mean of the set of pixel values in a neighborhood $S_{xy}$
-- $\sigma_{xy}$: standard deviation of the set of pixel values in neighborhood $S_{xy}$
-- $S_{xy}$: neighborhood centered at coordinates $(x, y)$ in an image  
+
+-   $m_{xy}$: mean of the set of pixel values in a neighborhood $S_{xy}$
+-   $\sigma_{xy}$: standard deviation of the set of pixel values in neighborhood $S_{xy}$
+-   $S_{xy}$: neighborhood centered at coordinates $(x, y)$ in an image
 
 ### Common Forms of Variable Thresholds
 
@@ -920,7 +931,7 @@ where $m_G$ is the global image mean.
 The segmented image is computed as:
 
 $$
-g_{xy} = 
+g_{xy} =
 \begin{cases}
 1 & \text{if } f(x, y) > T_{xy} \\
 0 & \text{if } f(x, y) \leq T_{xy}
@@ -928,19 +939,22 @@ g_{xy} =
 $$
 
 where:
-- $f(x, y)$ is the input image  
-- This equation is evaluated for all pixel locations in the image  
-- A different threshold is computed at each location $(x, y)$ using the pixels in the neighborhood $S_{xy}$  
+
+-   $f(x, y)$ is the input image
+-   This equation is evaluated for all pixel locations in the image
+-   A different threshold is computed at each location $(x, y)$ using the pixels in the neighborhood $S_{xy}$
 
 #### Notes
-- S_xy is typically an odd-sized window (e.g., 15×15) centered at (x, y).
-- Local means and variances can be computed efficiently with integral images; modern hardware makes neighborhood processing fast.
+
+-   S_xy is typically an odd-sized window (e.g., 15×15) centered at (x, y).
+-   Local means and variances can be computed efficiently with integral images; modern hardware makes neighborhood processing fast.
 
 #### Predicate-Based Variable Thresholding
+
 Significant power (with a modest increase in computation) can be added to variable thresholding by using predicates based on the parameters computed in the neighborhood of a point $(x, y)$:
 
 $$
-g_{xy} = 
+g_{xy} =
 \begin{cases}
 1 & \text{if } Q(\text{local parameters}) \text{ is TRUE} \\
 0 & \text{if } Q(\text{local parameters}) \text{ is FALSE}
@@ -961,5 +975,156 @@ Q(m_{xy}, \sigma_{xy}) =
 \end{cases}
 $$
 
+### Variable Thresholding Based on Moving Averages
+
+A fast, locally adaptive thresholding method for cases where preprocessing (smoothing, edges) is impractical or insufficient, especially in high-throughput document processing.
+
+The idea is to compute a 1D moving average along each scan line and use it to define a local, per-pixel threshold.
+
+This implementation is useful in applications such as document processing, where speed is a fundamental requirement.
+
+### Serpentine (Zigzag) Scanning and Notation
+
+-   Scan the image line-by-line; alternate left-to-right and right-to-left to reduce directional illumination bias.
+-   On a given scan line, let z\_{k+1} be the intensity of the pixel encountered at step k+1 (k starts at 0 on each line).
+-   Let n be the window length (number of points) used in the moving average.
+
+#### Moving Average
+
+For the current scan line, the moving mean at the new point is:
+
+$$
+m_{k+1} =
+\begin{cases}
+\dfrac{1}{k+1}\sum_{i=1}^{k+1} z_i, & 0 \le k < n-1 \\
+\dfrac{1}{n}\sum_{i=k-n+2}^{k+1} z_i, & k \ge n-1
+\end{cases}
+\quad\text{with } m_1 = z_1.
+$$
+
+Equivalently (running update, for k ≥ n-1):
+
+$$
+m_{k+1} = m_k + \frac{z_{k+1} - z_{k-n+1}}{n}.
+$$
+
+Border handling: when fewer than n prior samples exist (near line ends), average over the available samples.
+
+Define a local threshold from the moving mean:
+
+$$
+T_{xy} = c\,m_{xy}, \quad c > 0,
+$$
+
+where m\_{xy} is the moving average at pixel (x,y) from Eq. (10-83). Classify using the standard pointwise rule:
+
+$$
+g(x,y) =
+\begin{cases}
+1, & f(x,y) > T_{xy} \\
+0, & \text{otherwise}
+\end{cases}
+$$
+
+with f(x,y) the input intensity and g(x,y) the binary output.
+
+#### Example: Document Thresholding via Moving Averages
+
+![alt text](/images/image88.png)
+
+-   Scene: Handwritten text corrupted by spot shading (e.g., flash illumination).
+-   Global Otsu thresholding fails due to strong nonuniform illumination.
+-   Moving-average local thresholding succeeds:
+    -   Rule of thumb: set window length n ≈ 5 × average stroke width.
+    -   Given stroke width ≈ 4 px → choose n = 20.
+    -   Use c = 0.5.
+
+---
+
+## Region Segmentation
+
+### Using K-Means Clustering
+
+The basic idea behind the clustering approach is to partition a set, $Q$, of observations into a specified number, $k$, of clusters. In _k-means clustering_, each observation is assigned to the cluster with the nearest mean (hence the name of the method), and each mean is called the **prototype** of its cluster. A k-means algorithm is an iterative procedure that successively refines the means until convergence is achieved.
+
+Let $\{z_1, z_2, \ldots, z_Q\}$ be a set of vector observations (samples). These vectors have the form:
+
+$$
+z =
+\begin{bmatrix}
+z_1 \\
+z_2 \\
+\vdots \\
+z_n
+\end{bmatrix}
+$$
+
+In image segmentation, each component of a vector $z$ represents a numerical pixel attribute. For example:
+
+-   If segmentation is based on grayscale intensity, then $z$ is a scalar representing pixel intensity.
+-   If we are segmenting RGB color images, $z$ is typically a 3-D vector, with each component representing the intensity of a pixel in one of the three primary color channels.
+
+The objective of k-means clustering is to partition the set $Q$ of observations into $k$ disjoint cluster sets:
+
+$$
+C = \{ C_1, C_2, \ldots, C_k \}, \quad |C| \leq |Q|
+$$
+
+such that the following criterion of optimality is satisfied:
+
+$$
+\arg \min_{C_i} \sum_{i=1}^k \sum_{z \in C_i} \| z - m_i \|^2
+$$
+
+where $m_i$ is the mean vector (centroid) of the samples in set $C_i$, and $\| \arg \|$ is the vector norm (typically Euclidean).
+
+In words: we seek the partition such that the sum of squared distances from each point in a cluster to its mean is minimized.
+
+Unfortunately, finding the global minimum is an NP-hard problem, so heuristic methods are used to approximate the solution. Below is the **standard k-means algorithm** based on the Euclidean distance.
+
+---
+
+## Standard K-Means Algorithm
+
+Given a set $\{ z_1, z_2, \ldots, z_Q \}$ of vector observations and a specified $k$:
+
+1. **Initialization**  
+   Specify an initial set of means:
+
+    $$
+    \{ m_1^{(0)}, m_2^{(0)}, \ldots, m_k^{(0)} \}
+    $$
+
+2. **Assign Samples to Clusters**  
+   For each sample $z_q$, assign it to the cluster whose mean is closest:
+
+    $$
+    z_q \in C_i \quad \text{if} \quad \| z_q - m_i \|^2 < \| z_q - m_j \|^2, \quad \forall j \neq i
+    $$
+
+3. **Update Cluster Centers (Means)**  
+   For each cluster $C_i$:
+
+    $$
+    m_i = \frac{1}{|C_i|} \sum_{z \in C_i} z
+    $$
+
+4. **Test for Convergence**  
+   Compute the residual error:
+    $$
+    E = \sum_{i=1}^k \| m_i^{(t)} - m_i^{(t-1)} \|
+    $$
+    Stop if $E \leq T$, where $T$ is a specified nonnegative threshold; otherwise, return to Step 2.
+
+---
+
+## Convergence and Practical Notes
+
+-   If $T = 0$, the algorithm converges in a finite number of iterations, but only to a **local minimum**.
+-   The result depends on the initial choice of means $\{m_i\}$.
+-   A common practice in data analysis is to choose initial means as $k$ random samples from the dataset and run the algorithm multiple times with different initializations to test stability.
+-   In image segmentation, however, the most critical issue is the choice of $k$, since it directly determines the number of segmented regions. Therefore, multiple random initializations are less commonly used in this context.
+
+## ![alt text](/images/image89.png)
 ---
 
