@@ -1370,4 +1370,51 @@ SLIC does not inherently enforce connectivity. Thus, after convergence, some **i
 -   The distance metric $D(p, i)$ used in SLIC is not purely Euclidean but includes both color and spatial proximity.
 -   In practice, SLIC convergence can be achieved with relatively large thresholds, e.g., $T = 10$ (as reported by Achanta et al., 2012).
 
+SLIC chooses initial centers regularly spaced so that each cluster covers approximately the same number of pixels (voxels, in 3D)
+
+The parameter $S$ in the SLIC algorithm controls the **grid spacing** for initializing superpixel centers, and thus determines the **expected size** of a superpixel. Its interpretation differs between 2D images and 1D signals.
+
+```
+In 2D (Standard SLIC): S is the grid spacing for initializing the superpixel centers.
+
+The "size" of a superpixel is its area, which is roughly S x S = S².
+
+Therefore, the relationship is:
+(Area per superpixel) * (Number of superpixels) ≈ (Total area)
+
+S² * n_sp ≈ n_tp
+
+S = sqrt(n_tp / n_sp)
+
+```
+
+In 1D signals, each superpixel is just an interval of length
+𝑆.
+
+In one-dimensional signals:
+
+-   The notion of "area" reduces to **length**.
+-   Each superpixel corresponds to a contiguous interval of the signal.
+-   Let $S_{\text{len}}$ be the average length of a superpixel.
+
+Then:
+
+$$
+\text{Length per superpixel} \cdot n_{sp} \approx \text{Total length}
+$$
+
+or equivalently:
+
+$$
+S_{\text{len}} \cdot n_{sp} \approx n_{tp}
+$$
+
+which simplifies to:
+
+$$
+S_{\text{len}} = \frac{n_{tp}}{n_{sp}}
+$$
+
+![alt text](/images/image92.png)
+
 ---
