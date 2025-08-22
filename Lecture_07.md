@@ -1126,5 +1126,248 @@ Given a set $\{ z_1, z_2, \ldots, z_Q \}$ of vector observations and a specified
 -   In image segmentation, however, the most critical issue is the choice of $k$, since it directly determines the number of segmented regions. Therefore, multiple random initializations are less commonly used in this context.
 
 ## ![alt text](/images/image89.png)
+
 ---
 
+### Region Segmentation Using Superpixels
+
+The idea behind **superpixels** is to replace the standard pixel grid by grouping pixels into **primitive regions** that are more perceptually meaningful than individual pixels.
+
+-   In sensitive applications (e.g., **computerized medical diagnosis**), approximate representations are often unacceptable.
+-   However, in domains such as **image-database queries, autonomous navigation, and robotics**, the benefits of efficiency and improved segmentation performance outweigh the loss of detail.
+
+#### Primary Requirement: Adherence to Boundaries
+
+One important requirement of any superpixel representation is **adherence to boundaries**. This means that boundaries between regions of interest must be preserved in a superpixel image.
+
+#### Effect of Reducing Superpixel Count
+
+The impact of decreasing the number of superpixels is shown
+![alt text](/images/image90.png)
+
+-   **1,000 superpixels**:
+
+    -   Some detail is lost, but most key structures remain visible.
+
+-   **500 superpixels**:
+
+    -   More noticeable loss of detail.
+    -   Two of the three small carvings on the fence disappear.
+
+-   **250 superpixels**:
+    -   The third carving is also lost.
+    -   Significant simplification occurs, but:
+        -   The main boundaries remain preserved.
+        -   The basic topology of the scene is still intact.
+
+---
+
+## SLIC Superpixel Algorithm
+
+SLIC is essentially a modification of the **k-means clustering algorithm**. The difference lies in the definition of the feature space and the distance metric used.
+
+Simple Linear Iterative Clustering (SLIC) generates superpixels by clustering pixels in a joint color–spatial feature space using a variant of k-means. It is conceptually simple and computationally efficient because assignment is restricted to a local window around each cluster center.
+
+---
+
+## Representation of Observations
+
+SLIC typically uses (but is not limited to) **5-dimensional vectors** containing three color components and two spatial coordinates. For an image in the RGB color space, the vector representation of a pixel is:
+
+```
+z = [ r, g, b, x, y ]ᵀ
+```
+
+where:
+
+-   $(r, g, b)$ are the three color components of the pixel.
+-   $(x, y)$ are the spatial coordinates of the pixel.
+
+---
+
+## Initialization
+
+-   Let $n_{sp}$ denote the **desired number of superpixels**.
+-   Let $n_{tp}$ denote the **total number of pixels** in the image.
+
+The grid spacing interval $s$ is chosen as:
+
+$$
+s = \sqrt{\frac{n_{tp}}{n_{sp}}}
+$$
+
+This ensures that the generated superpixels are approximately equal in area.
+
+The **initial superpixel centers** are sampled on a regular grid, each represented as:
+
+$$
+m_i = [r_i, g_i, b_i, x_i, y_i]ᵀ, \quad i = 1, 2, \dots, n_{sp}
+$$
+
+To avoid centering a superpixel on an edge or noisy pixel, each initial center is moved to the **lowest gradient position** in its $3 \times 3$ neighborhood.
+
+---
+
+## Algorithm Steps
+
+### Step 1 — Initialization
+
+-   Assign each pixel $p$ a label $L(p) = -1$ and a distance $d(p) = \infty$.
+-   Place initial cluster centers $m_i$ on a regular grid spaced $s$ units apart.
+
+---
+
+### Step 2 — Assignment
+
+-   For each cluster center $m_i$, compute the distance $D(p, i)$ between $m_i$ and each pixel $p$ in its local $2s \times 2s$ neighborhood.
+-   If $D(p, i) < d(p)$, then update:
+    $$
+    d(p) = D(p, i), \quad L(p) = i
+    $$
+
+---
+
+### Step 3 — Update
+
+-   For each cluster $C_i$, update the cluster center as the mean of all pixels assigned to it:
+
+$$
+m_i = \frac{1}{|C_i|} \sum_{z \in C_i} z
+$$
+
+where $|C_i|$ is the number of pixels in cluster $C_i$, and $z$.
+
+---
+
+### Step 4 — Convergence Test
+
+-   Compute the residual error $E$ as the sum of Euclidean norms of the differences between the new and old cluster centers.
+-   If $E < T$, where $T$ is a nonnegative threshold, stop. Otherwise, return to **Step 2**.
+
+---
+
+### Step 5 — Post-Processing
+
+-   Each superpixel region $C_i$ is assigned a constant value, typically the average of its member pixels:
+
+$$
+m_i = \frac{1}{|C_i|} \sum_{z \in C_i} z
+$$
+
+-   For grayscale images, this reduces to the average intensity within the superpixel.
+
+SLIC superpixels are formed as clusters in a **joint space of color and spatial variables**. It is not appropriate to use a single Euclidean distance in this case, since the scales of the color and spatial components are different and unrelated. To address this, SLIC **normalizes the distances of the different components** and then combines them into a composite distance measure.
+
+### Color and Spatial Distances
+
+Let $d_c$ and $d_s$ denote the **color** and **spatial Euclidean distances**, respectively, between two points $i$ and $j$ in a cluster.
+
+### Color distance:
+
+$$
+d_c = \sqrt{(r_j - r_i)^2 + (g_j - g_i)^2 + (b_j - b_i)^2}
+$$
+
+where $(r, g, b)$ are the pixel color components.
+
+### Spatial distance:
+
+$$
+d_s = \sqrt{(x_j - x_i)^2 + (y_j - y_i)^2}
+$$
+
+where $(x, y)$ are the pixel coordinates.
+
+---
+
+### Composite Distance
+
+The overall distance $D$ is defined as:
+
+$$
+D = \sqrt{\left(\frac{d_c}{d_{cm}}\right)^2 + \left(\frac{d_s}{d_{sm}}\right)^2}
+$$
+
+where:
+
+-   $d_{cm}$ = maximum expected color distance.
+-   $d_{sm}$ = maximum expected spatial distance.
+
+The maximum spatial distance is chosen as the sampling interval:
+
+$$
+d_{sm} = s = \sqrt{\frac{n_{tp}}{n_{sp}}}
+$$
+
+Determining $d_{cm}$ is more complex, as color variation depends on the cluster and the image. A common approach is to set:
+
+$$
+d_{cm} = c
+$$
+
+which transforms Eq into:
+
+$$
+D = \sqrt{\left(\frac{d_c}{c}\right)^2 + \left(\frac{d_s}{s}\right)^2}
+$$
+
+or equivalently:
+
+$$
+D = \sqrt{d_c^2 + \left(\frac{d_s}{s} c \right)^2}
+$$
+
+---
+
+-   When $c$ is **large**:
+
+    -   Spatial proximity dominates.
+    -   Superpixels are **more compact and uniform**.
+
+-   When $c$ is **small**:
+    -   Color similarity dominates.
+    -   Superpixels adhere **more tightly to object boundaries**, but have irregular shapes.
+
+---
+
+### Special Cases
+
+-   **Grayscale images**:
+
+    Replace $d_c$ with intensity difference:
+
+    $$
+    d_c = |l_j - l_i|
+    $$
+
+    where $l$ is the pixel intensity.
+
+-   **3-D data (supervoxels)**:
+
+    The spatial distance extends to include the third spatial coordinate $z$:
+
+    $$
+    d_s = \sqrt{(x_j - x_i)^2 + (y_j - y_i)^2 + (z_j - z_i)^2}
+    $$
+
+    and the feature vector becomes:
+
+    $$
+    z = [r, g, b, x, y, z]^T
+    $$
+
+---
+
+SLIC does not inherently enforce connectivity. Thus, after convergence, some **isolated pixels** may remain. These are reassigned using a **connected components algorithm**.
+
+![alt text](/images/image91.png)
+
+---
+
+#### Notes
+
+-   Unlike standard k-means, the SLIC algorithm does not compute distances for all pixels in the image, but rather restricts them to a **$2s \times 2s$ neighborhood** around each cluster center. This greatly reduces computational cost.
+-   The distance metric $D(p, i)$ used in SLIC is not purely Euclidean but includes both color and spatial proximity.
+-   In practice, SLIC convergence can be achieved with relatively large thresholds, e.g., $T = 10$ (as reported by Achanta et al., 2012).
+
+---
